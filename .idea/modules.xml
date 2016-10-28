@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/fomasy.iml" filepath="$PROJECT_DIR$/fomasy.iml" />
+      <module fileurl="file://$PROJECT_DIR$/fomasy_common/fomasy_common.iml" filepath="$PROJECT_DIR$/fomasy_common/fomasy_common.iml" />
+      <module fileurl="file://$PROJECT_DIR$/fomasy_core/fomasy_core.iml" filepath="$PROJECT_DIR$/fomasy_core/fomasy_core.iml" />
+      <module fileurl="file://$PROJECT_DIR$/fomasy_datamodel/fomasy_datamodel.iml" filepath="$PROJECT_DIR$/fomasy_datamodel/fomasy_datamodel.iml" />
+      <module fileurl="file://$PROJECT_DIR$/fomasy_io/fomasy_io.iml" filepath="$PROJECT_DIR$/fomasy_io/fomasy_io.iml" />
+      <module fileurl="file://$PROJECT_DIR$/fomasy_preprocessing/fomasy_preprocessing.iml" filepath="$PROJECT_DIR$/fomasy_preprocessing/fomasy_preprocessing.iml" />
+    </modules>
+  </component>
+</project>

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>fomasy_parent</artifactId>
+        <groupId>de.uni_leipzig.dbs</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>fomasy_core</artifactId>
+
+    <dependencies>
+        <!--topic modelling-->
+        <dependency>
+            <groupId>cc.mallet</groupId>
+            <artifactId>mallet</artifactId>
+            <version>2.0.7</version>
+        </dependency>
+        <dependency>
+            <groupId>de.uni_leipzig.dbs</groupId>
+            <artifactId>fomasy_preprocessing</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>de.uni_leipzig.dbs</groupId>
+            <artifactId>fomasy_datamodel</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>de.uni_leipzig.dbs</groupId>
+            <artifactId>fomasy_io</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+        <groupId>de.uni_leipzig.dbs</groupId>
+        <artifactId>fomasy_common</artifactId>
+        <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>de.uni_leipzig.dbs</groupId>
+            <artifactId>fomasy_preprocessing</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <artifactId>MetaMap-API</artifactId>
+            <groupId>metamap</groupId>
+            <version>2.0</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/lib/MetaMapApi.jar</systemPath>
+        </dependency>
+        <dependency>
+            <artifactId>prologBeans</artifactId>
+            <groupId>prolog</groupId>
+            <version>1.0</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/lib/prologbeans.jar</systemPath>
+        </dependency>
+    </dependencies>
+
+</project>
