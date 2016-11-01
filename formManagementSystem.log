@@ -89,3 +89,19 @@
 %-4r [main] INFO  de.uni_leipzig.dbs.formRepository.evals.ReuseEvaluation  -preprocessing	269954
 %-4r [main] INFO  de.uni_leipzig.dbs.formRepository.evals.ReuseEvaluation  -identification	792254
 %-4r [main] INFO  de.uni_leipzig.dbs.formRepository.evals.ReuseEvaluation  -selection	762992
+%-4r [main] INFO  de.uni_leipzig.dbs.formRepository.evals.ReuseEvaluation  -threshold=0.55
+%-4r [main] INFO  de.uni_leipzig.dbs.formRepository.evals.ReuseEvaluation  -context_depth=1
+%-4r [main] INFO  de.uni_leipzig.dbs.formRepository.evals.ReuseEvaluation  -number of general concepts: 12853
+%-4r [main] INFO  de.uni_leipzig.dbs.formRepository.evals.ReuseEvaluation  -avgSize: 2.245301
+%-4r [main] INFO  de.uni_leipzig.dbs.formRepository.evals.ReuseEvaluation  -general concepts: 497
+%-4r [main] INFO  de.uni_leipzig.dbs.formRepository.evals.ReuseEvaluation  -reuse of 2603 clusters
+%-4r [main] INFO  de.uni_leipzig.dbs.formRepository.evals.ReuseEvaluation  -[GenericProperty [name=representant, scope=N/A, id=-2, language=EN]]
+%-4r [main] INFO  de.uni_leipzig.dbs.formRepository.evals.ReuseEvaluation  -calculates token similarity...
+%-4r [main] INFO  de.uni_leipzig.dbs.formRepository.matching.lookup.TokenSimilarityLookup  -10141
+%-4r [main] INFO  de.uni_leipzig.dbs.formRepository.matching.lookup.TokenSimilarityLookup  -word src: 10141
+%-4r [main] INFO  de.uni_leipzig.dbs.formRepository.matching.lookup.TokenSimilarityLookup  -target word: 2706
+%-4r [main] INFO  de.uni_leipzig.dbs.formRepository.matching.lookup.TokenSimilarityLookup  -sim words:5858
+%-4r [main] INFO  de.uni_leipzig.dbs.formRepository.evals.ReuseEvaluation  -token lookup built
+%-4r [main] INFO  de.uni_leipzig.dbs.formRepository.matching.lookup.TokenSimilarityLookup  -10141
+%-4r [main] INFO  de.uni_leipzig.dbs.formRepository.matching.lookup.TokenSimilarityLookup  -word src: 10141
+%-4r [main] INFO  de.uni_leipzig.dbs.formRepository.matching.lookup.TokenSimilarityLookup  -target word: 560160
