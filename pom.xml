@@ -12,6 +12,7 @@
         <module>fomasy_datamodel</module>
         <module>fomasy_io</module>
         <module>fomasy_common</module>
+        <module>fomasy_core</module>
     </modules>
     <name>fomasy_parent</name>
     <packaging>pom</packaging>
