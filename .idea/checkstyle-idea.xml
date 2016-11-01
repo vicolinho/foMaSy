@@ -3,14 +3,7 @@
   <component name="CheckStyle-IDEA">
     <option name="configuration">
       <map>
-        <entry key="active-configuration" value="PROJECT_RELATIVE:$PRJ_DIR$/../gradoop/gradoop-checkstyle/src/main/resources/gradoop/checkstyle.xml:gr-cs" />
-        <entry key="check-nonjava-files" value="false" />
-        <entry key="check-test-classes" value="false" />
         <entry key="location-0" value="CLASSPATH:/sun_checks.xml:The default CheckStyle rules" />
-        <entry key="location-1" value="PROJECT_RELATIVE:$PRJ_DIR$/../gradoop/gradoop-checkstyle/src/main/resources/gradoop/checkstyle.xml:gr-cs" />
-        <entry key="property-1.checkstyle.header.file" value="C:\Users\christen\intelijWorkspace\gradoop\gradoop-checkstyle\src\main\resources\gradoop\LICENSE.txt" />
-        <entry key="suppress-errors" value="true" />
-        <entry key="thirdparty-classpath" value="" />
       </map>
     </option>
   </component>

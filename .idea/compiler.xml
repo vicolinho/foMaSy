@@ -30,11 +30,11 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="fomasy" target="1.5" />
       <module name="fomasy_common" target="1.5" />
       <module name="fomasy_core" target="1.5" />
       <module name="fomasy_datamodel" target="1.5" />
       <module name="fomasy_io" target="1.5" />
+      <module name="fomasy_parent" target="1.5" />
       <module name="fomasy_preprocessing" target="1.5" />
     </bytecodeTargetLevel>
   </component>
