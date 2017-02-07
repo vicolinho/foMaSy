@@ -13,9 +13,9 @@ import de.uni_leipzig.dbs.formRepository.exception.InstallationException;
 
 public class RDBMS_RepositoryAPI implements RepositoryAPI {
 
-	public static final String CREATE_SCHEMA = "de/uni_leipzig/dbs/formRepository/api/sql/create.sql";
+	public static final String CREATE_SCHEMA = "create.sql";
 	
-	public static final String DROP_SCHEMA = "de/uni_leipzig/dbs/formRepository/api/sql/drop.sql";//, primary key(ent_struct_id)
+	public static final String DROP_SCHEMA = "drop.sql";//, primary key(ent_struct_id)
 	public static final String TEST = " Create table if not exists entity_structure(ent_struct_id int not null auto_increment, Primary Key(ent_struct_id), name varchar(500) unique, ent_type varchar(200), index(name))";
 	public void installRepository() throws InstallationException {
 		
