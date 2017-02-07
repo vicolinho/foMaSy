@@ -1,4 +1,4 @@
-package de.uni_leipzig.dbs.formRepository.importer.main;
+package de.uni_leipzig.dbs.formRepository.import_execution;
 
 import java.io.File;
 import java.io.FileNotFoundException;
