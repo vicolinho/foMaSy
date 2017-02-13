@@ -114,7 +114,7 @@ public class EntityStructureImporter {
 	
 	
 	
-	public void importForm (String file) throws FileNotFoundException, IOException, InstantiationException, IllegalAccessException, ClassNotFoundException, ImportException{
+	public void importForm (String file) throws IOException, InstantiationException, IllegalAccessException, ClassNotFoundException, ImportException{
 		Properties prop = new Properties();
 		prop.load(new BufferedReader(new FileReader(file)));
 		Map <String,Object> props = new HashMap<String,Object>();
@@ -187,6 +187,10 @@ public class EntityStructureImporter {
 
 	public String getSource() {
 		return source;
+	}
+
+	public void setSource(String s){
+		this.source = s;
 	}
 
 

@@ -1,5 +1,6 @@
 package de.uni_leipzig.dbs.formRepository.evals;
 
+import de.uni_leipzig.dbs.formRepository.matching.preprocessing.exception.PreprocessingException;
 import it.unimi.dsi.fastutil.ints.Int2FloatMap;
 
 import java.util.HashMap;
@@ -375,6 +376,9 @@ public class ReuseEvaluationWithSignificant {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}// catch (IOException e) {
+		catch (PreprocessingException e) {
+			e.printStackTrace();
+		}
 //			// TODO Auto-generated catch block
 //			e.printStackTrace();
 //		}

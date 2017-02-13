@@ -230,7 +230,6 @@ public class RDBMS_GraphAPI implements GraphAPI{
 				}//stack is not empty
 			}
 			relStmt.close();
-			log.info(edgeTypeCount.toString());
 		} catch (SQLException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -306,7 +305,6 @@ public class RDBMS_GraphAPI implements GraphAPI{
 				}//stack is not empty
 			}
 			relStmt.close();
-			log.info(edgeTypeCount.toString());
 		} catch (SQLException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();

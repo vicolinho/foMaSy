@@ -13,26 +13,30 @@ package de.uni_leipzig.dbs.formRepository.dataModel.util;
 		public static long code(long a, long b) {
 			return (long)(0.5*(a+b)*(a+b+1)+b);
 		}
-		
+
+
 		/**
-		 * The method decodes the first number of the basic number pair 
-		 * for which the code result is given. 
+		 * The method decodes the first number of the basic number pair
+		 * for which the code result is given.
 		 * @param c code result to be decoded
 		 * @return first number of the number pair
 		 */
 		public static long decode_a(long c) {
-			return s(c)-decode_b(c);
+			long a = (long) Math.floor(Math.sqrt(0.25 + 2*c) - 0.5);
+			return a - (c - a*(a+1)/2);
+			//return s(c)-decode_b(c);
 		}
-		
+
 		/**
-		 * The method decodes the second number of the basic number pair 
-		 * for which the code result is given. 
+		 * The method decodes the second number of the basic number pair
+		 * for which the code result is given.
 		 * @param c code result to be decoded
 		 * @return second number of the number pair
 		 */
 		public static long decode_b(long  c) {
-			long s = s(c);
-			return (long)c-s*(s+1)/2;
+			//long s = s(c);
+			long b  = (long) Math.floor(Math.sqrt(0.25 + 2*c) - 0.5);
+			return c -b*(b+1)/2;
 		}
 		
 		/**

@@ -21,7 +21,9 @@ package de.uni_leipzig.dbs.formRepository.util;
 		 * @return first number of the number pair
 		 */
 		public static long decode_a(long c) {
-			return s(c)-decode_b(c);
+			long a = (long) Math.floor(Math.sqrt(0.25 + 2*c) - 0.5);
+			return a - (c - a*(a+1)/2);
+			//return s(c)-decode_b(c);
 		}
 		
 		/**
@@ -31,8 +33,9 @@ package de.uni_leipzig.dbs.formRepository.util;
 		 * @return second number of the number pair
 		 */
 		public static long decode_b(long  c) {
-			long s = s(c);
-			return (long)c-s*(s+1)/2;
+			//long s = s(c);
+			long b  = (long) Math.floor(Math.sqrt(0.25 + 2*c) - 0.5);
+			return c -b*(b+1)/2;
 		}
 		
 		/**

@@ -168,8 +168,8 @@ public class TFIDFTokenWeightGenerator implements WeightGenerator {
 			}
 			for (int id: idfMap.keySet()){
 				float count = idfMap.get(id); 
-				float idf = (float) Math.log(1+((float)size-(float)count+0.5f)/((float)count+0.5f));
-				//float idf = (float) Math.log((float)size/(float)count);
+				//float idf = (float) Math.log(1+((float)size-(float)count+0.5f)/((float)count+0.5f));
+				float idf =(float) Math.log((float)size/count);
 				if (idf<0)
 					log.error("idf is negative"+count+" size" +size);
 				idfMap.put(id, idf);
@@ -190,7 +190,7 @@ public class TFIDFTokenWeightGenerator implements WeightGenerator {
 		}
 		for (int id: idfMap.keySet()){
 			float idf = idfMap.get(id); 
-//			idf = (float) Math.log(1+((float)size-(float)idf+0.5f)/((float)idf+0.5f));
+			//idf = (float) Math.log(1+((float)size-(float)idf+0.5f)/((float)idf+0.5f));
 			idf = (float) Math.log((float)size/idf);
 			if (idf<0)
 				log.error("idf is negative"+idf);
@@ -200,11 +200,7 @@ public class TFIDFTokenWeightGenerator implements WeightGenerator {
 		return idfMap;
 	}
 	
-	
-	
-	
-	
-	@Override
+
 	public  Int2FloatMap getWeightMap() {
 		// TODO Auto-generated method stub
 		return null;

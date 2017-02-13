@@ -1,5 +1,6 @@
 package de.uni_leipzig.dbs.formRepository.evals;
 
+import de.uni_leipzig.dbs.formRepository.matching.preprocessing.exception.PreprocessingException;
 import it.unimi.dsi.fastutil.ints.Int2FloatMap;
 
 import java.io.IOException;
@@ -335,8 +336,10 @@ public class HolisticAnnotationMain {
 		} catch (InitializationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} catch (PreprocessingException e) {
+			e.printStackTrace();
 		}
-		
+
 	}
 	
 	private AnnotationMapping filterMappingByOverlappedTermGroups (Map<Integer,TokenCluster> clusterMap,List<TokenCluster> list, Map<Integer,Set<TokenCluster>> subsetMap,Map<Integer,Set<TokenCluster>> supersetMap, AnnotationMapping mapping) {

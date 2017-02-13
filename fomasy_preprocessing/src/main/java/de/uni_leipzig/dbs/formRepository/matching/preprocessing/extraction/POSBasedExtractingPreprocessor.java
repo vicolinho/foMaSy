@@ -29,7 +29,7 @@ public class POSBasedExtractingPreprocessor implements Preprocessor {
 	public EntityStructureVersion preprocess(EntityStructureVersion esv,
 			List<PreprocessProperty> propList,
 			Map<String, Object> externalSources) {
-		
+			StringBuilder sb = new StringBuilder();
 				Set <String> filterTags = (Set<String>) externalSources.get(FILTER_TYPES);
 				String grammar = "edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz";
 			    String[] options = { "-maxLength", "80", "-retainTmpSubcategories" };
@@ -42,14 +42,19 @@ public class POSBasedExtractingPreprocessor implements Preprocessor {
 							String value = pv.getValue();
 							List<?extends HasWord> list = lp.tokenize(value);
 							Tree tree = lp.parse(list);
-							StringBuffer sb = new StringBuffer();
+
 							for (TaggedWord tw:tree.taggedYield()){
 								if (filterTags.contains(tw.tag())){
 									sb.append(tw.value()+" ");
 								}
 							}
-							String newValue = sb.toString().trim();
-							pv.setValue(newValue);
+
+							if (sb.length()>0) {
+								String newValue = sb.toString().trim();
+								newValue = newValue.replaceAll("\\s+", " ");
+								pv.setValue(newValue);
+								sb.delete(0, sb.length() - 1);
+							}
 						}
 						ge.changePropertyValues(values);
 			    	}
@@ -61,6 +66,7 @@ public class POSBasedExtractingPreprocessor implements Preprocessor {
 	public EntitySet<GenericEntity> preprocess(EntitySet<GenericEntity> esv,
 			List<PreprocessProperty> propList,
 			Map<String, Object> externalSources) {
+		StringBuilder sb = new StringBuilder();
 		Set <String> filterTags = (Set<String>) externalSources.get(FILTER_TYPES);
 		String grammar = "edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz";
 	    String[] options = { "-maxLength", "80", "-retainTmpSubcategories" };
@@ -73,7 +79,6 @@ public class POSBasedExtractingPreprocessor implements Preprocessor {
 					String value = pv.getValue();
 					List<?extends HasWord> list = lp.tokenize(value);
 					Tree tree = lp.parse(list);
-					StringBuffer sb = new StringBuffer();
 					for (TaggedWord tw:tree.taggedYield()){
 						if (filterTags.contains(tw.tag())){
 							sb.append(tw.value()+" ");
@@ -81,6 +86,7 @@ public class POSBasedExtractingPreprocessor implements Preprocessor {
 					}
 					String newValue = sb.toString().trim();
 					pv.setValue(newValue);
+					sb.delete(0,sb.length()-1);
 				}
 				ge.changePropertyValues(values);
 	    	}

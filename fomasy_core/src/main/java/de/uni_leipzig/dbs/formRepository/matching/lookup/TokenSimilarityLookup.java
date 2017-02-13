@@ -39,8 +39,7 @@ public class TokenSimilarityLookup {
 			}
 		}
 		GenericProperty wordgp = new GenericProperty(-1, "word", null, null);
-		wordStructure.addAvailableProperty(wordgp);;
-		log.info(words.size());
+		wordStructure.addAvailableProperty(wordgp);
 		for (String w :words){
 			GenericEntity ge = new GenericEntity (EncodingManager.getInstance().checkToken(w), w, "word", -1);
 			PropertyValue pvPropertyValue =new PropertyValue(EncodingManager.getInstance().checkToken(w),w);
@@ -50,6 +49,7 @@ public class TokenSimilarityLookup {
 		
 		words.clear();
 		log .info("word src: " + wordStructure.getNumberOfEntities());
+
 		Collection<GenericProperty> properties =target.getAvailableProperties();
 		for (GenericEntity ge:target.getEntities()){
 			for (GenericProperty gp :properties){
@@ -63,8 +63,7 @@ public class TokenSimilarityLookup {
 				}
 			}
 		}
-	
-		
+
 		EntityStructureVersion targetWord = new EntityStructureVersion(new VersionMetadata(-3, null, null, null, null));
 		targetWord.addAvailableProperty(wordgp);
 		for (String w :words){
@@ -79,7 +78,7 @@ public class TokenSimilarityLookup {
 		ExecutionTree tree = new ExecutionTree();
 		Set<GenericProperty> setGp = new HashSet<GenericProperty>();
 		setGp.add(wordgp);
-		MatchOperator mop = new MatchOperator (RegisteredMatcher.TRIGRAM_MATCHER, AggregationFunction.MAX, setGp, setGp, 0.65f);
+		MatchOperator mop = new MatchOperator (RegisteredMatcher.TRIGRAM_MATCHER, AggregationFunction.MAX, setGp, setGp, 0.7f);
 		tree.addOperator(mop);
 		AnnotationMapping mapping = rep.getMatchManager().match(wordStructure, src, trg, targetWord, tree, null);
 		Map<Integer,Set<Integer>> wordCluster = new HashMap<Integer,Set<Integer>>();
@@ -121,7 +120,7 @@ public class TokenSimilarityLookup {
 		}
 		
 		GenericProperty wordgp = new GenericProperty(-1, "word", null, null);
-		wordStructure.addAvailableProperty(wordgp);;
+		wordStructure.addAvailableProperty(wordgp);
 		log.info(words.size());
 		for (String w :words){
 			GenericEntity ge = new GenericEntity (EncodingManager.getInstance().checkToken(w), w, "word", -1);
@@ -161,7 +160,7 @@ public class TokenSimilarityLookup {
 		ExecutionTree tree = new ExecutionTree();
 		Set<GenericProperty> setGp = new HashSet<GenericProperty>();
 		setGp.add(wordgp);
-		MatchOperator mop = new MatchOperator (RegisteredMatcher.TRIGRAM_MATCHER, AggregationFunction.MAX, setGp, setGp, 0.65f);
+		MatchOperator mop = new MatchOperator (RegisteredMatcher.TRIGRAM_MATCHER, AggregationFunction.MAX, setGp, setGp, 0.7f);
 		tree.addOperator(mop);
 		AnnotationMapping mapping = rep.getMatchManager().match(wordStructure, src, trg, targetWord, tree, null);
 		Map<Integer,Set<Integer>> wordCluster = new HashMap<Integer,Set<Integer>>();
@@ -205,10 +204,8 @@ public class TokenSimilarityLookup {
 		return lookup;
 	}
 
-
-
 	public static void setLookup(Map<Integer,Set<Integer>> lookup) {
 		TokenSimilarityLookup.lookup = lookup;
 	}
-	
+
 }

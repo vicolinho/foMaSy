@@ -22,6 +22,9 @@ public class EncodedEntityStructure {
 	public EncodedEntityStructure (int entStructId){
 		this.structureId = entStructId;
 	}
+
+
+
 	public int getStructureId() {
 		return structureId;
 	}
@@ -63,6 +66,17 @@ public class EncodedEntityStructure {
 		return this.propertyValueIds[pos][propPos];
 		}catch (NullPointerException e){
 			return new int[][]{};
+		}
+	}
+
+	public int[][][] getPropertyValues(int entId){
+
+		int pos = this.objIds.get(entId);
+		try{
+
+			return this.propertyValueIds[pos];
+		}catch (NullPointerException e){
+			return new int[][][]{};
 		}
 	}
 	/**

@@ -10,7 +10,7 @@ public enum AggregationFunction {
  {
 		@Override
 		public float aggregateFloatList(List<Float> list) {
-			float currentMax = Float.NEGATIVE_INFINITY;
+			float currentMax = 0;
 			for (Float f: list){
 				currentMax = (f>currentMax)?f:currentMax;
 			}

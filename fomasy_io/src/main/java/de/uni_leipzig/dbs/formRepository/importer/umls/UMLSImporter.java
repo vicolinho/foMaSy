@@ -130,15 +130,14 @@ public class UMLSImporter extends PreSourceImporter{
 			
 			System.out.println("Get UMLS CUIs + concept information (name, synonyms..) ..");
 
-			String query = "SELECT DISTINCT CUI, STR, SUPPRESS, TTY, LAT, STT, LUI"
+			String query = "SELECT CUI, STR, SUPPRESS, TTY, LAT, STT, LUI"
 					+ " FROM MRCONSO "
-					+ "WHERE ( lcase(LAT) = 'eng' OR lcase(LAT) = 'ger')"
-					+ " order by CUI,LUI";
+					+ "WHERE ( lcase(LAT) = 'eng' OR lcase(LAT) = 'ger')";
 				    
 			// Objekt zum Ausfuehren von Queries
 			PreparedStatement psmt = conn.prepareStatement(query);
 			ResultSet rs = psmt.executeQuery(query);
-			
+			System.out.println("Executed query");
 			HashSet<String> prefferedConcepts = new HashSet<String>();
 			while (rs.next()) {
 				String lang = rs.getString(5);
@@ -172,7 +171,9 @@ public class UMLSImporter extends PreSourceImporter{
 					prefferedConcepts.add(cui);
 				}else {
 					attName = "synonym";
+					prefferedConcepts.add(cui);
 				}
+				scopeFMS = scopeUMLS;
 				String newLui = rs.getString(7);
 				Set<String> luis = insertLUIS.get(cui);
 				if (luis == null){

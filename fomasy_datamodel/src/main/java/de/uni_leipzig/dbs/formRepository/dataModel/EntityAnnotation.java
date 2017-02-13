@@ -37,7 +37,7 @@ public class EntityAnnotation implements Comparable<EntityAnnotation>{
 	}
 
 	public EntityAnnotation (long id,String srcAcc, String targetAcc, float sim, boolean isVerified){
-		id = id ;
+		this.id = id ;
 		srcId = (int) CantorDecoder.decode_a(id);
 		targetId = (int) CantorDecoder.decode_b(id);
 		this.srcAccession = srcAcc;
@@ -142,8 +142,6 @@ public class EntityAnnotation implements Comparable<EntityAnnotation>{
 		if (getClass() != obj.getClass())
 			return false;
 		EntityAnnotation other = (EntityAnnotation) obj;
-		if (id != other.id)
-			return false;
-		return true;
+		return id == other.id;
 	}
 }

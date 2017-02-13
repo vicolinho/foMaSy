@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import de.uni_leipzig.dbs.formRepository.matching.blocking.Blocking;
+import de.uni_leipzig.dbs.formRepository.matching.blocking.data.BlockSet;
 import org.apache.log4j.Logger;
 
 import it.unimi.dsi.fastutil.ints.Int2FloatMap;
@@ -70,6 +72,10 @@ public class SoftTFIDFMatcher extends Matcher {
 			if (this.getGlobalObjects().get(LOOKUP)!=null){
 				lookup = (Map<Integer,Set<Integer>>)this.getGlobalObjects().get(LOOKUP);
 			}
+			BlockSet blocks =null;
+			if(this.getGlobalObjects().get(Blocking.BLOCKING_FIELD)!=null){
+				blocks = (BlockSet)this.getGlobalObjects().get(Blocking.BLOCKING_FIELD);
+			}
 			int numberOfProcessros = Runtime.getRuntime().availableProcessors();
 			int threadNumber;
 			if (source.getObjIds().size()<1000&&target.getObjIds().size()<1000) {
@@ -93,7 +99,7 @@ public class SoftTFIDFMatcher extends Matcher {
 				for (int i=0;i<threadNumber;i++) {
 					IntSet partObjIds = domObjIDsParts.get(i);
 					SoftTFIDFThread tmpThread = new SoftTFIDFThread (source, target, partObjIds, targetSet, function, threshold, this.getPropertyIds1(), this.getPropertyIds2(),
-							idfSourceMap, idfTargetMap, lookup, pruning,wndSize,isAdaptive);
+							idfSourceMap, idfTargetMap, lookup, blocks,wndSize,isAdaptive);
 					threadList.add(tmpThread);
 				}
 			} else {
@@ -111,7 +117,7 @@ public class SoftTFIDFMatcher extends Matcher {
 				for (int i=0;i<threadNumber;i++) {
 					IntSet partObjIds = domObjIDsParts.get(i);
 					SoftTFIDFThread tmpThread = new SoftTFIDFThread (source, target, sourceSet, partObjIds, function, threshold, this.getPropertyIds1(), this.getPropertyIds2(),
-							idfSourceMap, idfTargetMap, lookup, pruning,wndSize,isAdaptive);
+							idfSourceMap, idfTargetMap, lookup, blocks,wndSize,isAdaptive);
 					threadList.add(tmpThread);
 				}
 			}

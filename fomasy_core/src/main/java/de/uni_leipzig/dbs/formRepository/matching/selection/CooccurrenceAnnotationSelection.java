@@ -53,11 +53,11 @@ public class CooccurrenceAnnotationSelection implements GraphBasedSelection {
 		for (Entry<Integer,List<EntityAnnotation>> e:annoPerItem.entrySet()){
 			if (e.getValue().size()>1){
 				EncodedEntityStructure umlSubset = this.getUMLSConcepts(e.getValue(), target);
-				Map<Integer,List<Integer>> simGroups = GroupFunctions.groupSimilarUMLSConsByCommonToken(umlSubset, e.getKey(), am);
+				Map<Integer,Set<Integer>> simGroups = GroupFunctions.groupSimilarUMLSConsByCommonToken(umlSubset, e.getKey(), am);
 				Set <Long> keptAnnotations = new HashSet<Long>();
 				EntityAnnotation currentCor;
 				Map<Integer,Set<Integer>> conflictNodesPerNode = new HashMap<Integer,Set<Integer>>();
-				for (List<Integer> list:simGroups.values()){
+				for (Set<Integer> list:simGroups.values()){
 					for (int g: list){
 						Set<Integer> set = conflictNodesPerNode.get(g);
 						if (set ==null){
@@ -67,9 +67,10 @@ public class CooccurrenceAnnotationSelection implements GraphBasedSelection {
 						set.addAll(list);
 					}
 				}
-				Map<Integer,Float> ranking = this.calculateScores(graph, am, umlSubset,e.getKey(),conflictNodesPerNode,formConceptNodes);
-				for (List<Integer> umlsGroup:simGroups.values()){
-					
+				Map<Integer,Float> ranking = this.calculateScores(graph, am, umlSubset, e.getKey(), conflictNodesPerNode, formConceptNodes);
+
+
+				for (Set<Integer> umlsGroup:simGroups.values()){
 					TreeMap<Float,List<EntityAnnotation>> maxCorrs = new TreeMap<Float,List<EntityAnnotation>>();
 					for (Integer u : umlsGroup){
 						currentCor = am.getAnnotation(e.getKey(), u);
@@ -142,8 +143,7 @@ public class CooccurrenceAnnotationSelection implements GraphBasedSelection {
 	}
 	
 	public Map<Integer,Float> calculateScores (DirectedGraph<Node, Edge> graph,AnnotationMapping am,
-			EncodedEntityStructure umlSubset,List<Integer> conflGroup,
-			int srcEntity){
+			EncodedEntityStructure umlSubset,List<Integer> conflGroup, int srcEntity){
 		Map<Integer,Float> ranking = new HashMap<Integer,Float> ();
 		Set<Integer> confSet = new HashSet<Integer>(conflGroup);
 		Set<Node> roots = new HashSet<Node> ();
@@ -159,7 +159,6 @@ public class CooccurrenceAnnotationSelection implements GraphBasedSelection {
 					conflictNodes.add(n);
 				}
 			}
-				
 		}
 		KNeighborhoodFilter<Node,Edge> filter= new KNeighborhoodFilter<Node,Edge>(roots, 3, EdgeType.IN_OUT);
 		DirectedGraph<Node,Edge> subGraph = (DirectedGraph<Node, Edge>) filter.transform(graph);
@@ -196,7 +195,6 @@ public class CooccurrenceAnnotationSelection implements GraphBasedSelection {
 			if (!ranking.containsKey(c)){
 				ranking.put(c, am.getAnnotation(srcEntity, c).getSim()*SIM_WEIGHT);
 			}
-				
 		}
 		return ranking;
 	}
@@ -216,12 +214,13 @@ public class CooccurrenceAnnotationSelection implements GraphBasedSelection {
 			}
 		}
 		//TODO check if it achieves better quality
+		/*
 		for (int id :formConceptNodes){
 			Node n = new NodeImpl(id);
 			if (graph.containsVertex(n)){
 				relevantNodes.put(id,n);	
 			}
-		}
+		}*/
 		
 		KNeighborhoodFilter<Node,Edge> filter= new KNeighborhoodFilter<Node,Edge>(roots, 3, EdgeType.IN_OUT);
 		
@@ -303,7 +302,6 @@ public class CooccurrenceAnnotationSelection implements GraphBasedSelection {
 			if (!ranking.containsKey(c)){
 				ranking.put(c, am.getAnnotation(srcEntity, c).getSim()*SIM_WEIGHT);
 			}
-				
 		}
 		return ranking;
 	}

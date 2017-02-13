@@ -49,12 +49,12 @@ public class MatcherWorkflowExecuter {
 	private List<Long2FloatMap> intermediateResults;
 		
 	public MatcherWorkflowExecuter(){
-		
+		result = new Long2FloatOpenHashMap();
 	}
 	
 	public Long2FloatMap match(EncodedEntityStructure source, EncodedEntityStructure target, ExecutionTree tree, Pruning pruning) throws MatchingExecutionException{
 		this.state = START;
-		this.result = new Long2FloatOpenHashMap();
+		this.result.clear();
 		this.evidenceMap = new Long2ObjectOpenHashMap<Set<Integer>>();
 		this.intermediateResults = new ArrayList<Long2FloatMap>();
 		while(!tree.isProcessQueueEmpty()){
@@ -116,7 +116,8 @@ public class MatcherWorkflowExecuter {
 		return result;
 	}
 	
-	private void processState (int state, EncodedEntityStructure source, EncodedEntityStructure target,Pruning pr, Operator op) throws MatchingExecutionException{
+	private void processState (int state, EncodedEntityStructure source, EncodedEntityStructure target,
+														 Pruning pr, Operator op) throws MatchingExecutionException{
 		if (state ==MATCHING1 ||state == MATCHING2){
 			try {
 				
@@ -186,6 +187,7 @@ public class MatcherWorkflowExecuter {
 			m.setGlobalObjects(mop.getGlobalObjects());
 		}
 		result = m.computeSimilarity(source, target, mop.getAggFunction(), mop.getThreshold(), pruning);
+		log.debug(mop.getMachterName()+":"+result.size());
 		if (m.getEvidenceMap().size()!=0){
 			this.evidenceMap.putAll(m.getEvidenceMap());
 		}

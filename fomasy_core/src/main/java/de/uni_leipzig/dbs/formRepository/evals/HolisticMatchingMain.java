@@ -1,5 +1,6 @@
 package de.uni_leipzig.dbs.formRepository.evals;
 
+import de.uni_leipzig.dbs.formRepository.matching.preprocessing.exception.PreprocessingException;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 
 import java.io.BufferedWriter;
@@ -75,7 +76,11 @@ public class HolisticMatchingMain {
 			Set<String> types = new HashSet<String>();
 			types.add("item");
 			for(EntityStructureVersion esv:forms){
-				esv = exec.preprocess(esv, config);
+				try {
+					esv = exec.preprocess(esv, config);
+				} catch (PreprocessingException e) {
+					e.printStackTrace();
+				}
 				EncodedEntityStructure ees = EncodingManager.getInstance().encoding(esv,types, true);
 				eess.add(ees);
 				TFIDFTokenWeightGenerator.getInstance().initializeGlobalCountPerForm(ees.getStructureId(), ees.getPropertyValueIds(),

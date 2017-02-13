@@ -1,5 +1,6 @@
 package de.uni_leipzig.dbs.formRepository.evals;
 
+import de.uni_leipzig.dbs.formRepository.matching.preprocessing.exception.PreprocessingException;
 import it.unimi.dsi.fastutil.ints.Int2FloatMap;
 
 import java.io.FileNotFoundException;
@@ -76,14 +77,14 @@ public class ReuseEvaluationWithContext {
 	static String[] generalConcepts = new String[]{"Qualitative Concept","Quantitative Concept",
 		"Functional Concept","Conceptual Entity","Temporal Concept"};
 	
-	
-//	static int[] selectedForms = new int[]{3,2,8,9,10,
-//		11,12,13,14,15,
-//		16,20,21,76,77,
-//		78,79,80,81,82,
-//		83,84,85,86,87};
+	/*
+	static int[] selectedForms = new int[]{2,3,8,9,10,
+		11,12,13,14,15,
+		16,20,21,76,77,
+		78,79,80,81,82,
+	83,84,85,86,87};
+*/
 
-	
 	static int[] selectedForms = new int[]{1,2,7,8,9,
 										  10,11,12,13,14,
 										  15,19,20,75,76,
@@ -104,12 +105,12 @@ public class ReuseEvaluationWithContext {
 	static boolean onlySelectedForms = true;
 	private static long matchTime;
 	private static long selectionTime;
-	private static long preprocessingTime ;
+	private static long preprocessingTime;
 	
 	public static void main (String[] args){
 		FormRepository rep = new FormRepositoryImpl();
 		
-		Set<String> wordTypes = new HashSet<String>();
+		Set<String> wordTypes = new HashSet<>();
 		for(String i: t){
 			wordTypes.add(i);
 		}
@@ -188,13 +189,9 @@ public class ReuseEvaluationWithContext {
 			}
 			log.info("number of general concepts: "+ toFilteringConceptIds.size());
 			
-			
-			//formConfig.addPreprocessingStepForProperties(PreprocessingSteps.NUMBER_NORMALIZATION, propForms);
 			formConfig.addPreprocessingStepForProperties(PreprocessingSteps.TO_LOW, propForms,propFormName);
 			formConfig.addPreprocessingStepForProperties(PreprocessingSteps.STOPWORD_EXTRACTION, propForms,propFormName);
-//			formConfig.addPreprocessingStepForProperties(PreprocessingSteps.NORMALIZE, propForms,propFormName);
-			
-//			formConfig.addPreprocessingStepForProperties(PreprocessingSteps.KEYWORD_EXTRACTION, propForms,propFormName);
+			formConfig.addPreprocessingStepForProperties(PreprocessingSteps.KEYWORD_EXTRACTION, propForms,propFormName);
 			PreprocessorExecutor executor = new PreprocessorExecutor();
 			int size = 0;
 			
@@ -304,6 +301,7 @@ public class ReuseEvaluationWithContext {
 			preprocessingTime += (System.currentTimeMillis()-umlsPreStart);
 			long restLookup = System.currentTimeMillis();
 			TokenSimilarityLookup.getInstance().computeTrigramLookup(set, umls, rep);
+			System.out.println("lookup time:"+(System.currentTimeMillis()-restLookup));
 			matchTime += (System.currentTimeMillis()-restLookup);
 			log.info("calcualte umls lookup ready");
 			Set<String> semTypesGraph = new HashSet<String> ();
@@ -345,8 +343,6 @@ public class ReuseEvaluationWithContext {
 						}
 						matchTime +=(System.currentTimeMillis()-restMatchTime);
 						long selStart = System.currentTimeMillis();
-//						reuseAnno = SetAnnotationOperator.union(AggregationFunction.MAX, reuseAnno, restAnno);
-//						reuseAnno = sel2.select(reuseAnno, ees1, umlsEnc, formProperties, gp, 0.35f, 0, avgEntitySize, rep);
 						restAnno  =groupSelection.select(restAnno, ees1, umlsEnc, formProperties, umlsProperties, 0.35f, 0, avgEntitySize, rep);
 						reuseAnno = graphBasedSelection.selectAnnotationMapping(unionGraph, reuseAnno, ees1,
 								umlsEnc, formProperties, gp, 0.35f, 0,avgEntitySize, rep);
@@ -502,15 +498,17 @@ public class ReuseEvaluationWithContext {
 		catch (EntityAPIException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} catch (PreprocessingException e) {
+			e.printStackTrace();
 		}
- 
+
 
 	}
 	
 	public static DirectedGraph<Node,Edge> getGraph(String clusterName,
 			Map<GenericEntity,AnnotationCluster> clusterMap,Set<String> semTypes,
 			FormRepository rep){
-		Map<GenericEntity,AnnotationCluster> filterMap = new HashMap<GenericEntity,AnnotationCluster>();; 
+		Map<GenericEntity,AnnotationCluster> filterMap = new HashMap<>();
 			for (GenericEntity ge:clusterMap.keySet()){
 				List<String> values = ge.getPropertyValues("sem_type", null, null);
 				boolean found =false;
@@ -545,7 +543,7 @@ public class ReuseEvaluationWithContext {
 		
 		EntityStructureVersion semTypeGraph = rep.getFormManager().getStructureVersion("semanticNetwork", "ontology", "2014-01-01");
 		Set<GenericProperty> propSource = rep.getFormManager().getAvailableProperties("umls2014AB", "2014-01-01", "ontology");
-		Set<GenericProperty> joinAtt = new HashSet<GenericProperty>();
+		Set<GenericProperty> joinAtt = new HashSet<>();
 		for (GenericProperty joinGp: propSource){
 			if (joinGp.getName().equals("sem_type"))
 				joinAtt.add(joinGp);
@@ -575,7 +573,7 @@ public class ReuseEvaluationWithContext {
 			EntityStructureVersion umls ,EncodedEntityStructure ees,EntityStructureVersion esv,Set<GenericProperty> formProperties,
 			Set<GenericProperty> targetProperties, int size,FormRepository rep){
 		Set<Integer> restEntities = new HashSet<Integer>();
-		MatchOperator mop = new MatchOperator (RegisteredMatcher.SOFT_TFIDF_WND_MATCHER,AggregationFunction.MAX, formProperties, targetProperties, 0.7f);
+		MatchOperator mop = new MatchOperator (RegisteredMatcher.SOFT_TFIDF_WND_MATCHER,AggregationFunction.MAX, formProperties, targetProperties, 0.8f);
 		Map<String,Object> externalMap = new HashMap<String,Object>();
 		externalMap.put(TFIDFWindowMatcher.WND_SIZE, 5);
 		externalMap.put(TFIDFWindowMatcher.IS_ADAPTIVE_SIZE, false);
@@ -617,7 +615,11 @@ public class ReuseEvaluationWithContext {
 		umlsConfig.addPreprocessingStepForProperties(PreprocessingSteps.STOPWORD_EXTRACTION, propSyn,propName);
 		//umlsConfig.addPreprocessingStepForProperties(PreprocessingSteps.NORMALIZE, propSyn,propName);
 		PreprocessorExecutor executor = new PreprocessorExecutor();
-		executor.preprocess(umls, umlsConfig);
+		try {
+			executor.preprocess(umls, umlsConfig);
+		} catch (PreprocessingException e) {
+			e.printStackTrace();
+		}
 		EncodedEntityStructure ees = EncodingManager.getInstance().encoding(umls, true);
 		TFIDFTokenWeightGenerator.getInstance().initializeGlobalCount(ees, umlsProperties.toArray(new GenericProperty[]{}));
 		return ees;

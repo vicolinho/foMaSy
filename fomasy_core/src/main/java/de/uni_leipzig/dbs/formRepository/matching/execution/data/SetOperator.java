@@ -75,7 +75,6 @@ public class SetOperator extends Operator{
 						}else if (aggFunction == AggregationFunction.AVG){
 							combinedMap.put(cor, sim.floatValue()+aggSim);
 							occMap.put(cor, occMap.get(cor)+1);
-							
 						}
 					}
 				}
@@ -87,6 +86,5 @@ public class SetOperator extends Operator{
 			}
 		}
 		return combinedMap;
-		
 	}
 }

@@ -78,7 +78,7 @@ public class TFIDFWindowThread extends AbstractPartMatcher{
 	
 	@Override
 	public void run(){
-		evidenceConfMap = new HashMap<Float,Set<Integer>>();
+		evidenceConfMap = new HashMap<>();
 		Collection <Integer> propertyPos = srcStructure.getPropertyPosition().values();
 		List <Float> confidenceList = new ArrayList<Float>();
 		
@@ -109,27 +109,25 @@ public class TFIDFWindowThread extends AbstractPartMatcher{
 				for (int srcPropertyPos : propertyIds1){
 					for (int[] trigramSrc:srcStructure.getPropertyValueIds()[entitySrcPos][srcPropertyPos]){
 						int start = 0;
-						//for (int currentWindow =2; currentWindow<windowSize;currentWindow++){
-							int end = (windowSize<trigramSrc.length)?windowSize: trigramSrc.length;
-							do{
-								Int2IntMap countMapSrc = this.getFrequencies(trigramSrc, start, end);
-								for (int targetPropertyPos :propertyIds2){
-									for (int [] trigramTarget: targetStructure.getPropertyValueIds()[targetPos][targetPropertyPos]){
-										Int2IntMap countMapTarget = this.getFrequencies(trigramTarget, 0,trigramTarget.length);
-										confidenceList.add(this.computeSimilarity(trigramSrc, trigramTarget, countMapSrc , countMapTarget));
-									}
+						int end = (windowSize<trigramSrc.length)?windowSize: trigramSrc.length;
+						do{
+							Int2IntMap countMapSrc = this.getFrequencies(trigramSrc, start, end);
+							for (int targetPropertyPos :propertyIds2){
+								for (int [] trigramTarget: targetStructure.getPropertyValueIds()[targetPos][targetPropertyPos]){
+									Int2IntMap countMapTarget = this.getFrequencies(trigramTarget, 0,trigramTarget.length);
+									confidenceList.add(this.computeSimilarity(trigramSrc, trigramTarget, countMapSrc , countMapTarget));
 								}
-								start++;
-								end++;
-							}while(end<trigramSrc.length);
-						//}
+							}
+							start++;
+							end++;
+						}while(end<trigramSrc.length);
 					}
 				}
 				
 				
 				float sim = aggFunc.aggregateFloatList(confidenceList);
 				Set<Integer> evidence = this.evidenceConfMap.get(sim);
-				//this.addResult(srcStructure.getStructureId(), targetStructure.getStructureId(), entitySrcId, te, sim);
+
 				this.addResultWithEvidence(srcStructure.getStructureId(), targetStructure.getStructureId(), entitySrcId, te,evidence,
 						sim);
 				confidenceList.clear();

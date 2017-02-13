@@ -31,9 +31,9 @@ public class AnnotationMapping {
 	private String method;
 	private Map <Long, EntityAnnotation> annotations;
 	
-	private HashMap<Integer,Set<Long>> srcCorrespondenceMap;
+	//private HashMap<Integer,Set<Long>> srcCorrespondenceMap;
 	
-	private  HashMap<Integer,Set<Long>> targetCorrespondenceMap;
+	//private  HashMap<Integer,Set<Long>> targetCorrespondenceMap;
 	
 	private Long2ObjectMap<Set<Integer>> evidenceMap ;
 	
@@ -47,14 +47,15 @@ public class AnnotationMapping {
 	
 	public AnnotationMapping (){
 		this.annotations = new HashMap<Long,EntityAnnotation>();
-		srcCorrespondenceMap = new HashMap<Integer,Set<Long>>();
-		targetCorrespondenceMap = new HashMap<Integer,Set<Long>>();
+		//srcCorrespondenceMap = new HashMap<Integer,Set<Long>>();
+		//targetCorrespondenceMap = new HashMap<Integer,Set<Long>>();
 		this.setEvidenceMap(new Long2ObjectOpenHashMap<Set<Integer>>());
 	}
 	
 	
 	public void addAnnotation (EntityAnnotation a){
 		this.annotations.put(a.getId(), a);
+		/*
 		Set<Long> srcAnnos = this.srcCorrespondenceMap.get(a.getSrcId());
 		if (srcAnnos==null){
 			srcAnnos = new HashSet<Long>();
@@ -66,12 +67,13 @@ public class AnnotationMapping {
 			this.targetCorrespondenceMap.put(a.getTargetId(), targetAnnos);
 		}
 		srcAnnos.add(a.getId());
-		targetAnnos.add(a.getId());
+		targetAnnos.add(a.getId());*/
 	}
 	
 	public void removeAnnotation (int srcId,int targetId){
 		long code  = CantorDecoder.code(srcId, targetId);
 		this.annotations.remove(code);
+		/*
 		Set<Long> srcAnnos = this.srcCorrespondenceMap.get(srcId);
 		if (srcAnnos!=null){
 			srcAnnos.remove(code);
@@ -79,9 +81,7 @@ public class AnnotationMapping {
 		Set<Long> targetAnnos = this.targetCorrespondenceMap.get(targetId);
 		if (targetAnnos!=null){
 			targetAnnos.remove(code);
-		}
-		
-		
+		}*/
 	}
 
 
@@ -100,32 +100,52 @@ public class AnnotationMapping {
 
 	public Set<Integer> getCorrespondingTargetIds (int srcId){
 		Set <Integer> set = new HashSet<Integer>();
-		Set<Long> corrIds = this.srcCorrespondenceMap.get(srcId);
-		if (corrIds!=null){
-			for (Long id : corrIds){
-				set.add(this.annotations.get(id).getTargetId());
-			}
+		//Set<Long> corrIds = this.srcCorrespondenceMap.get(srcId);
+		for (EntityAnnotation ea: this.getAnnotations()) {
+			//if (corrIds != null) {
+			//	for (Long id : corrIds) {
+			if (ea.getSrcId() == srcId)
+				//set.add(this.annotations.get(id).getTargetId());
+			set.add(ea.getTargetId());
+			//	}
+			//}
 		}
 		return set;
 	}
 	
 	public boolean containsCorrespondingTargetIds (int srcId){
-		return this.srcCorrespondenceMap.containsKey(srcId);
+		for (EntityAnnotation ea : this.getAnnotations()){
+			if (srcId == ea.getSrcId()){
+				return true;
+			}
+		}
+		return false;
+		//return this.srcCorrespondenceMap.containsKey(srcId);
 	}
 	
 	public Set<Integer> getCorrespondingSrcIds (int targetId){
 		Set <Integer> set = new HashSet<Integer>();
-		Set<Long> corrIds = this.targetCorrespondenceMap.get(targetId);
-		if (corrIds!=null){
-			for (Long id : corrIds){
-				set.add(this.annotations.get(id).getSrcId());
-			}
+		//Set<Long> corrIds = this.targetCorrespondenceMap.get(targetId);
+		for (EntityAnnotation ea: this.getAnnotations()) {
+			//if (corrIds != null) {
+				//for (Long id : corrIds) {
+			if (ea.getTargetId() == targetId)
+				set.add(ea.getSrcId());
+			//set.add(this.annotations.get(id).getSrcId());
+				//}
+			//}
 		}
 		return set;
 	}
 	
 	public boolean containsCorrespondingSrcIds (int targetId){
-		return this.targetCorrespondenceMap.containsKey(targetId);
+		for (EntityAnnotation ea : this.getAnnotations()){
+			if (targetId == ea.getTargetId()){
+				return true;
+			}
+		}
+		return false;
+		//return this.targetCorrespondenceMap.containsKey(targetId);
 	}
 	
 	public boolean contains(EntityAnnotation am){

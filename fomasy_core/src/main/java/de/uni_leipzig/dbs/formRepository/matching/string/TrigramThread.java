@@ -98,8 +98,6 @@ public class TrigramThread extends AbstractPartMatcher{
 						for (int[] trigramSrc:srcTrigrams[srcIndex][srcPropertyPos]){
 							for (int [] trigramTarget: targetTrigrams[targetIndex][targetPropertyPos]){
 								float sim = this.computeSimilarity(trigramSrc, trigramTarget);
-//								if (srcId ==447&& te == 876257)
-//									log.debug(sim);
 								confidenceList.add(sim);
 							}
 						}

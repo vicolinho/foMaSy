@@ -152,11 +152,12 @@ public class RDBMS_EntityStructureImportAPI implements EntityStructureImportAPI 
 		Connection con = null;
 		try {
 			con = DBConHandler.getInstance().getConnection();
+			con.setAutoCommit(false);
 			PreparedStatement pstmtEnt = con.
 					prepareStatement(INSERT_TMP_OBJ);
 			PreparedStatement pstmtAtts = con.
 					prepareStatement(INSERT_TMP_PROP);
-			int batchSize =100000;
+			int batchSize =10000;
 			int currentSize =0; 
 			for (ImportEntity e: importEntities){
 				if (currentSize==batchSize){
@@ -164,6 +165,7 @@ public class RDBMS_EntityStructureImportAPI implements EntityStructureImportAPI 
 					pstmtAtts.executeBatch();
 					pstmtEnt.clearBatch();
 					pstmtAtts.clearBatch();
+					con.commit();
 					currentSize =0;
 				}
 				
@@ -196,9 +198,11 @@ public class RDBMS_EntityStructureImportAPI implements EntityStructureImportAPI 
 				pstmtAtts.executeBatch();
 				pstmtEnt.clearBatch();
 				pstmtAtts.clearBatch();
+				con.commit();
 				pstmtEnt.close();
 				pstmtAtts.close();
 			}
+			con.setAutoCommit(true);
 			con.close();
 		} catch (SQLException e) {
 			
@@ -273,9 +277,7 @@ public class RDBMS_EntityStructureImportAPI implements EntityStructureImportAPI 
 			ResultSet rs = stmt.executeQuery(ancestorQuery);
 			if (rs.next()){
 				Date d = rs.getDate(1);
-				if (d!=null)
-					return true;
-				else return false;
+				return d != null;
 			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -394,8 +396,7 @@ public class RDBMS_EntityStructureImportAPI implements EntityStructureImportAPI 
 		}
 	}
 	
-	
-	@Override
+
 	public void determineRelDiff(VersionMetadata current){
 		
 		
@@ -491,7 +492,6 @@ public class RDBMS_EntityStructureImportAPI implements EntityStructureImportAPI 
 		
 	}
 
-	@Override
 	public void cleanTmpTables() {
 		// TODO Auto-generated method stub
 		Connection con =null;
@@ -519,7 +519,6 @@ public class RDBMS_EntityStructureImportAPI implements EntityStructureImportAPI 
 		}
 	}
 
-	@Override
 	public void importRelsForVersion(
 			VersionMetadata currentVersion) {
 		Connection con =null;

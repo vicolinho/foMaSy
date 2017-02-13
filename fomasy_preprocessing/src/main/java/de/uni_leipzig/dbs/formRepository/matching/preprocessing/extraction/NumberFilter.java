@@ -25,7 +25,8 @@ public class NumberFilter implements Preprocessor{
 				
 				StringPropertyValueSet values = ge.getPropertyValueSet(pp.getName(), pp.getLang(),pp.getScope());
 				for (PropertyValue pv: values.getCollection()){
-					String value = pv.getValue().replaceAll("[0-9]{1,6}", "");
+					String value = pv.getValue().replaceAll("\\s[0-9]{1,3}(\\.[0-9]{1,3})?", "");
+					value = value.replaceAll("\\s+"," ").trim();
 					pv.setValue(value);
 				}
 				ge.changePropertyValues(values);
@@ -43,7 +44,8 @@ public class NumberFilter implements Preprocessor{
 				
 				StringPropertyValueSet values = ge.getPropertyValueSet(pp.getName(), pp.getLang(),pp.getScope());
 				for (PropertyValue pv: values.getCollection()){
-					String value = pv.getValue().replaceAll("[0-9]{1,6}", "");
+					String value = pv.getValue().replaceAll("\\s[0-9]{1,3}(\\.[0-9]{1,3})?", " ");
+					value = value.replaceAll("\\s+"," ").trim();
 					pv.setValue(value);
 				}
 				ge.changePropertyValues(values);

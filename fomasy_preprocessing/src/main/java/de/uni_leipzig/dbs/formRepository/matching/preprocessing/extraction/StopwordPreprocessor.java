@@ -13,11 +13,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import de.uni_leipzig.dbs.formRepository.dataModel.EntitySet;
-import de.uni_leipzig.dbs.formRepository.dataModel.EntityStructureVersion;
-import de.uni_leipzig.dbs.formRepository.dataModel.GenericEntity;
-import de.uni_leipzig.dbs.formRepository.dataModel.PropertyValue;
-import de.uni_leipzig.dbs.formRepository.dataModel.StringPropertyValueSet;
+import de.uni_leipzig.dbs.formRepository.dataModel.*;
 import de.uni_leipzig.dbs.formRepository.matching.preprocessing.PreprocessProperty;
 import de.uni_leipzig.dbs.formRepository.matching.preprocessing.Preprocessor;
 
@@ -92,8 +88,7 @@ public class StopwordPreprocessor implements Preprocessor {
 		// TODO Auto-generated method stub
 		return esv;
 	}
-	
-	
+
 	private Set<String> readFile(InputStream file) throws IOException{
 		InputStreamReader fr = new InputStreamReader ((file));
 		BufferedReader br= new BufferedReader(fr);

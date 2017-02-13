@@ -100,7 +100,7 @@ public class TFIDFThread extends AbstractPartMatcher{
 							for (int [] trigramTarget: targetStructure.getPropertyValueIds()[targetPos][targetPropertyPos]){
 								Int2IntMap countMapTarget = new Int2IntOpenHashMap();
 								countMapTarget = this.getFrequencies(trigramTarget, countMapTarget);
-								float sim = this.computeSimilarity(countMapSrc , countMapTarget);	
+								float sim = this.computeSimilarity(countMapSrc , countMapTarget);
 								confidenceList.add(sim);
 							}
 						}
@@ -115,12 +115,7 @@ public class TFIDFThread extends AbstractPartMatcher{
 			e1.printStackTrace();
 		}
 	}
-
 	}
-	
-	
-	int srcEntId = 0;
-	int targetID =0;
 	private float computeSimilarity (Int2IntMap frequencySrc, Int2IntMap frequencyTarget){
 		Set <Integer> intersect = new HashSet<Integer>(frequencySrc.keySet());
 		intersect.retainAll(frequencyTarget.keySet());
@@ -167,7 +162,159 @@ public class TFIDFThread extends AbstractPartMatcher{
 		}
 		return sim;
 	}
-	
+
+
+	private float computeHammingSimilarity (Int2IntMap frequencySrc, Int2IntMap frequencyTarget){
+		Set<Integer> commonWords = new HashSet<Integer>(frequencySrc.keySet());
+		commonWords.retainAll(frequencyTarget.keySet());
+
+		if(commonWords.size()==0)
+			return 0f;
+
+		Set<Integer> wordsOnlyInFirst= new HashSet<Integer>(frequencySrc.keySet());
+		wordsOnlyInFirst.removeAll(commonWords);
+
+		Set<Integer> wordsOnlyInSecond= new HashSet<Integer>(frequencyTarget.keySet());
+		wordsOnlyInSecond.removeAll(commonWords);
+
+
+		float idf_word_domain,idf_word_range;
+
+		double simpleLength1 =0,simpleLength2=0;
+		double weightedSum1=0;
+		double weightedSum2 =0;
+		for(Integer commonWord : commonWords)
+		{
+
+			idf_word_domain= idfSourceMap.get(commonWord);
+			idf_word_range = idfTargetMap.get(commonWord);
+
+			int tf1= frequencySrc.get(commonWord);
+			int tf2= frequencyTarget.get(commonWord);
+			double tf_idf1=((double)tf1) * idf_word_domain;
+			simpleLength1 += tf_idf1;
+
+			double tf_idf2= ((double)tf2) * idf_word_range;
+			simpleLength2 += tf_idf2;
+			//if (idfReaderRange.getIDF(multiAttributeIndex, commonWord)<0)
+			//	System.out.println(idfReaderRange.getIDF(multiAttributeIndex, commonWord));
+		}
+
+
+
+		for(Integer wordOnlyInFirst : wordsOnlyInFirst){
+			double tf_idf1=((double)frequencySrc.get(wordOnlyInFirst)) *
+							idfSourceMap.get(wordOnlyInFirst);
+			weightedSum1 += tf_idf1;
+			simpleLength1+=tf_idf1;
+		}
+
+
+
+		for(Integer wordOnlyInSecond : wordsOnlyInSecond){
+			double tf_idf2= ((double)frequencyTarget.get(wordOnlyInSecond)) *
+							idfTargetMap.get(wordOnlyInSecond);
+			//	if (idfReaderRange.getIDF(multiAttributeIndex, wordOnlyInSecond)<0)
+			//			System.out.println(idfReaderRange.getIDF(multiAttributeIndex, wordOnlyInSecond));
+			weightedSum2 += tf_idf2;
+			simpleLength2+=tf_idf2;
+		}
+
+
+		//System.out.println(hammingDistance);
+
+		double hamConfidence = 1/(1d+(weightedSum1/simpleLength1+weightedSum2/simpleLength2));
+		if (simpleLength1==0&& simpleLength2==0){
+			hamConfidence =1;
+		}
+		if (hamConfidence>1){
+			System.out.println(weightedSum1+"\t"+simpleLength1);
+			System.out.println(weightedSum2+"\t"+simpleLength2);
+			System.out.println("hamming:"+hamConfidence);
+		}//System.out.println("hamming:"+hamConfidence);
+		//
+		return Double.isNaN(hamConfidence) ? 0f : (float) hamConfidence;
+	}
+
+
+
+
+	public float computeWeightedConfidence(Int2IntMap frequencySrc, Int2IntMap frequencyTarget){
+		Set<Integer> commonWords = new HashSet<Integer>(frequencySrc.keySet());
+		commonWords.retainAll(frequencyTarget.keySet());
+
+		if(commonWords.size()==0)
+			return 0f;
+
+		Set<Integer> wordsOnlyInFirst= new HashSet<Integer>(frequencySrc.keySet());
+		wordsOnlyInFirst.removeAll(commonWords);
+
+		Set<Integer> wordsOnlyInSecond= new HashSet<Integer>(frequencyTarget.keySet());
+		wordsOnlyInSecond.removeAll(commonWords);
+
+
+		float idf_word_domain,idf_word_range;
+		double dotProduct= 0, length1= 0, length2= 0;
+		double simpleLength1 =0,simpleLength2 =0;
+		for(Integer commonWord : commonWords)
+		{
+			idf_word_domain= idfSourceMap.get(commonWord);
+			idf_word_range =  idfTargetMap.get(commonWord);
+
+			int tf1= frequencySrc.get(commonWord);
+			int tf2= frequencyTarget.get(commonWord);
+
+			double tf_idf1=((double)tf1/(double)frequencySrc.size()) * idf_word_domain;
+			double tf_idf1_squared= tf_idf1 * tf_idf1;
+			length1+= tf_idf1_squared;
+			simpleLength1+=tf_idf1;
+
+			double tf_idf2;
+			//if(tf1==tf2) OPTIMIERUNG GEHT NICHT WENN QUELLEN GETRENNT BETRACHTET WERDEN
+			//{
+			//	tf_idf2= tf_idf1;
+			//	length2+= tf_idf1_squared;
+			//}
+			//else
+			//{
+			tf_idf2=((double)tf2/(double)frequencyTarget.size()) * idf_word_range;
+			length2+= tf_idf2 * tf_idf2;
+			simpleLength2+=tf_idf2;
+			//}
+
+			dotProduct+= tf_idf1 * tf_idf2;
+		}
+		double hamming1 =0;
+		for(Integer wordOnlyInFirst : wordsOnlyInFirst)
+		{
+			double tf_idf1=((double)frequencySrc.get(wordOnlyInFirst)/
+							(double)frequencySrc.size()) * idfSourceMap.get(wordOnlyInFirst);
+			hamming1 += tf_idf1;
+			simpleLength1+=tf_idf1;
+			length1+= tf_idf1 * tf_idf1;
+		}
+		double hamming2=0;
+		for(Integer wordOnlyInSecond : wordsOnlyInSecond)
+		{
+			double tf_idf2= ((double)frequencyTarget.get(wordOnlyInSecond)/
+							(double)frequencyTarget.size()) * idfTargetMap.get(wordOnlyInSecond);
+			hamming2 += tf_idf2;
+			length2+= tf_idf2 * tf_idf2;
+			simpleLength2+=tf_idf2;
+		}
+		double hammingDistance = hamming1/simpleLength1+hamming2/simpleLength2;
+		//System.out.println(hammingDistance);
+		length1= Math.sqrt(length1);
+		length2= Math.sqrt(length2);
+		double productOfLengths= length1 * length2;
+
+		if(productOfLengths<dotProduct)	// correct for floating-point rounding errors
+			productOfLengths= dotProduct;
+
+		double cosine= dotProduct / productOfLengths;
+		double weightCosine = /*(cosine);*/cosine/(Math.pow(hammingDistance, 4)+cosine);
+		return Double.isNaN(weightCosine) ? 0f : (float) weightCosine;
+	}
 	
 	 
 	private Int2IntMap getFrequencies (int [] tokens, Int2IntMap frequencies){

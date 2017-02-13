@@ -1,5 +1,6 @@
 package de.uni_leipzig.dbs.formRepository.evals;
 
+import de.uni_leipzig.dbs.formRepository.matching.preprocessing.exception.PreprocessingException;
 import it.unimi.dsi.fastutil.ints.Int2FloatMap;
 
 import java.io.IOException;
@@ -425,6 +426,9 @@ public class ReuseEvaluation {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} //catch (IOException e) {
+		catch (PreprocessingException e) {
+			e.printStackTrace();
+		}
 //			e.printStackTrace();
 //		}
 	}
@@ -481,7 +485,11 @@ public class ReuseEvaluation {
 		umlsConfig.addPreprocessingStepForProperties(PreprocessingSteps.STOPWORD_EXTRACTION, propSyn,propName);
 		
 		PreprocessorExecutor executor = new PreprocessorExecutor();
-		executor.preprocess(umls, umlsConfig);
+		try {
+			executor.preprocess(umls, umlsConfig);
+		} catch (PreprocessingException e) {
+			e.printStackTrace();
+		}
 		EncodedEntityStructure ees = EncodingManager.getInstance().encoding(umls, true);
 		TFIDFTokenWeightGenerator.getInstance().initializeGlobalCount(ees, umlsProperties.toArray(new GenericProperty[]{}));
 		

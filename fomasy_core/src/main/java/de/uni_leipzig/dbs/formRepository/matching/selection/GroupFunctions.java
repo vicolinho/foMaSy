@@ -1,14 +1,14 @@
 package de.uni_leipzig.dbs.formRepository.matching.selection;
 
+
+import edu.stanford.nlp.graph.ConnectedComponents;
+import edu.uci.ics.jung.algorithms.cluster.WeakComponentClusterer;
+import edu.uci.ics.jung.graph.*;
 import it.unimi.dsi.fastutil.ints.Int2FloatMap;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
+
 
 import org.apache.log4j.Logger;
 
@@ -35,20 +35,14 @@ import edu.ucla.sspace.matrix.Matrix;
 class GroupFunctions {
 
 	static Logger log = Logger.getLogger(GroupFunctions.class);
-public static HashMap<Integer, List<Integer>> groupSimilarUMLSConsByCliques(EncodedEntityStructure umlsGroup,Set<GenericProperty> preRanAtts,int size, FormRepository gi) {
+public static HashMap<Integer, List<Integer>> groupSimilarUMLSConsByCliques(EncodedEntityStructure umlsGroup,
+			Set<GenericProperty> preRanAtts,int size, FormRepository gi) {
 		
 		
 		EncodedAnnotationMapping set =new EncodedAnnotationMapping();
 		Set<Integer> srcs = new HashSet<Integer>();
 		srcs.add(umlsGroup.getStructureId());
-//		Int2FloatMap idfMap = TFIDFTokenWeightGenerator.getInstance().generateIDFValues(srcs, size);
-//		Map<String,Object> externalObjects = new HashMap<String,Object>();
-//		externalObjects.put(TFIDFMatcher.IDF_MAP_SOURCE, idfMap);
-//		externalObjects.put(TFIDFMatcher.IDF_MAP_TARGET, idfMap);
-//		externalObjects.put(TFIDFMatcher.TFIDF_SOURCE_SEPARATED,false);
-//		long time = System.currentTimeMillis();
 		MatchOperator mop = new MatchOperator (RegisteredMatcher.TRIGRAM_MATCHER, AggregationFunction.MAX, preRanAtts, preRanAtts, 0.35f);
-//		mop.setGlobalObjects(externalObjects);
 		ExecutionTree tree = new ExecutionTree();
 		tree.addOperator(mop);
 		try {
@@ -109,26 +103,22 @@ public static HashMap<Integer, List<Integer>> groupSimilarUMLSConsByCW(EncodedEn
 	EncodedAnnotationMapping set =new EncodedAnnotationMapping();
 	Set<Integer> srcs = new HashSet<Integer>();
 	srcs.add(umlsGroup.getStructureId());
-	Int2FloatMap idfMap = TFIDFTokenWeightGenerator.getInstance().generateIDFValues(srcs, size);
-	Map<String,Object> externalObjects = new HashMap<String,Object>();
-	externalObjects.put(TFIDFMatcher.IDF_MAP_SOURCE, idfMap);
-	externalObjects.put(TFIDFMatcher.IDF_MAP_TARGET, idfMap);
-	externalObjects.put(TFIDFMatcher.TFIDF_SOURCE_SEPARATED,false);
 	long time = System.currentTimeMillis();
-	MatchOperator mop = new MatchOperator (RegisteredMatcher.TFIDF_MATCHER, AggregationFunction.MAX, preRanAtts, preRanAtts, 0.3f);
-	mop.setGlobalObjects(externalObjects);
+	MatchOperator mop = new MatchOperator (RegisteredMatcher.TFIDF_MATCHER, AggregationFunction.MAX,
+					preRanAtts, preRanAtts, 0.35f);
 	ExecutionTree tree = new ExecutionTree();
 	tree.addOperator(mop);
 	try {
 		set = gi.getMatchManager().matchEncoded(umlsGroup, umlsGroup, tree, null);
 	} catch (MatchingExecutionException e1) {
-		// TODO Auto-generated catch block
 		e1.printStackTrace();
 	}
+
 	Map<Integer,Integer> positionMapping = new HashMap<Integer,Integer>();
 	Map<Integer,Integer> revMapping = new HashMap<Integer,Integer>();
 	HashSet<EntityAnnotation> toRemoveCorrs = new HashSet<EntityAnnotation>();
 	int id =0;
+
 	for (EntityAnnotation c: set.getAnnotations()){
 		if (c.getSrcId()==c.getTargetId()){
 			toRemoveCorrs.add(c);
@@ -182,13 +172,13 @@ public static HashMap<Integer, List<Integer>> groupSimilarUMLSConsByCW(EncodedEn
 	return umlsGroups;
 } 
 
-public  static HashMap<Integer, List<Integer>> groupSimilarUMLSConsByConnectedComponent(EncodedEntityStructure umlsGroup,Set<GenericProperty> preRanAtts,int size, FormRepository gi,
-		float threshold){
+public  static Map<Integer, Set<Integer>> groupSimilarUMLSConsByConnectedComponent(EncodedEntityStructure umlsGroup,
+	 	Set<GenericProperty> preRanAtts,int size, FormRepository gi, float threshold){
 	EncodedAnnotationMapping set =new EncodedAnnotationMapping();
 	Set<Integer> srcs = new HashSet<Integer>();
 	srcs.add(umlsGroup.getStructureId());
-	MatchOperator mop = new MatchOperator (RegisteredMatcher.TRIGRAM_MATCHER, AggregationFunction.MAX, preRanAtts, preRanAtts, 0.4f);
-
+	MatchOperator mop = new MatchOperator (RegisteredMatcher.TRIGRAM_MATCHER, AggregationFunction.MAX,
+					preRanAtts, preRanAtts, threshold);
 	ExecutionTree tree = new ExecutionTree();
 	tree.addOperator(mop);
 	try {
@@ -203,6 +193,7 @@ public  static HashMap<Integer, List<Integer>> groupSimilarUMLSConsByConnectedCo
 	HashMap <Integer,Node> nodeMap= new HashMap<Integer,Node>();
 	boolean isChange =true;
 	int counter =0;
+
 	for (EntityAnnotation c: set.getAnnotations()){
 		if (c.getSrcId()==c.getTargetId()){
 			toRemoveCorrs.add(c);
@@ -211,6 +202,14 @@ public  static HashMap<Integer, List<Integer>> groupSimilarUMLSConsByConnectedCo
 	for(EntityAnnotation c:toRemoveCorrs){
 		set.removeAnnotation(c.getSrcId(), c.getTargetId());
 	}
+/*
+	Iterator <EntityAnnotation> iter = set.getAnnotations().iterator();
+	while (iter.hasNext()){
+		EntityAnnotation c = iter.next();
+		if (c.getSrcId()==c.getTargetId()){
+			iter.remove();
+		}
+	}*/
 	
 	while(isChange&&counter<10000){
 		counter++;
@@ -233,11 +232,7 @@ public  static HashMap<Integer, List<Integer>> groupSimilarUMLSConsByConnectedCo
 						nodeMap.put(n2.ownId, n2);
 					}
 					int min = Math.min(n.minId, n2.minId);
-					if(n2.minId==min && n.minId==min){
-						isChange =false;
-					}else {
-						isChange =true;
-					}
+					isChange = !(n2.minId == min && n.minId == min);
 					n.minId = min;
 					n2.minId = min;
 				}
@@ -253,34 +248,31 @@ public  static HashMap<Integer, List<Integer>> groupSimilarUMLSConsByConnectedCo
 		}
 	}
 	
-	HashMap<Integer,List<Integer>> umlsGroups = new HashMap<Integer,List<Integer>>();
+	Map<Integer,Set<Integer>> umlsGroups = new HashMap<>();
 	HashSet<Integer> notInGroup =new HashSet<Integer>(); 
 	for (int id : umlsGroup.getObjIds().keySet()){
 		notInGroup.add(id);
 	}
 	notInGroup.removeAll(nodeMap.keySet());
 	for (Entry<Integer,Node> e: nodeMap.entrySet()){
-		List<Integer> list = umlsGroups.get(e.getValue().minId);
+		Set<Integer> list = umlsGroups.get(e.getValue().minId);
 		if (list==null){
-			list = new ArrayList<Integer>();
+			list = new HashSet<Integer>();
 			umlsGroups.put(e.getValue().minId,list);
 		}
 		list.add(e.getKey());
 	}
 	for (Integer nig : notInGroup){
-		List<Integer> list = new ArrayList<Integer>();
+		Set<Integer> list = new HashSet<>();
 		umlsGroups.put(nig, list);
 		list.add(nig);
 	}
 	return umlsGroups;
-	
-	
-	
 }
 	
-public static HashMap<Integer, List<Integer>> groupSimilarUMLSConsByCommonToken(EncodedEntityStructure umlsGroup,
+public static Map<Integer, Set<Integer>> groupSimilarUMLSConsByCommonToken(EncodedEntityStructure umlsGroup,
 		int srcId, AnnotationMapping am) {
-	HashMap<Integer,List<Integer>> umlsGroups = new HashMap<Integer,List<Integer>>();
+	Map<Integer,List<Integer>> umlsGroups = new HashMap<>();
 	Map<Integer,Set<Integer>> conceptToEvidenceSet = new HashMap<Integer,Set<Integer>>();
 	for (int targetId : umlsGroup.getObjIds().keySet()){
 		long anid = CantorDecoder.code(srcId, targetId);
@@ -295,9 +287,10 @@ public static HashMap<Integer, List<Integer>> groupSimilarUMLSConsByCommonToken(
 			group.add(targetId);
 		}	
 	}
-	
-	
-	Map<Integer, Set<Integer>> conceptTosupersets = getSupersetConceptRelationships(conceptToEvidenceSet);
+//TODO
+	//Map<Integer, Set<Integer>> conceptTosupersets = getSupersetConceptRelationships(conceptToEvidenceSet);
+	Map<Integer, Set<Integer>> conceptTosupersets = getOverlappedConcepts(conceptToEvidenceSet);
+	/*
 	for (Entry<Integer,List<Integer>> entry: umlsGroups.entrySet()){
 		for (int i =0;i<entry.getValue().size();i++){
 			int concept = entry.getValue().get(i);
@@ -317,18 +310,54 @@ public static HashMap<Integer, List<Integer>> groupSimilarUMLSConsByCommonToken(
 			}
 		}
 	}
-	return umlsGroups;
+	Map<Integer, Set<Integer>> returnGroups = new HashMap<>();
+	for (Entry<Integer,List<Integer>> e: umlsGroups.entrySet()){
+		returnGroups.put(e.getKey(),new HashSet<>(e.getValue()));
+	}*/
+	return conceptTosupersets;
 }
+
+
+
+	public static Map<Integer, Set<Integer>> getOverlappedConcepts (Map<Integer,Set<Integer>> conceptEvidenceMap){
+		Graph<Integer,Integer> graphOverlap = new UndirectedSparseGraph<>();
+		int edgeId = 0;
+		for (Entry<Integer,Set<Integer>> entry1 : conceptEvidenceMap.entrySet()) {
+			for (Entry<Integer, Set<Integer>> entry2 : conceptEvidenceMap.entrySet()) {
+				if (entry1.getKey()!= entry2.getKey()){
+					if (!graphOverlap.containsVertex(entry1.getKey())){
+						graphOverlap.addVertex(entry1.getKey());
+					}
+					if (!graphOverlap.containsVertex(entry2.getKey())){
+						graphOverlap.addVertex(entry2.getKey());
+					}
+					Set<Integer> copy = new HashSet<>(entry1.getValue());
+					copy.retainAll(entry2.getValue());
+					if (copy.size()!=0){
+						graphOverlap.addEdge(edgeId++,entry1.getKey(),entry2.getKey());
+					}
+				}
+			}
+		}
+		Map<Integer,Set<Integer>> groupTerm = new HashMap<>();
+		WeakComponentClusterer<Integer,Integer> componentClusterer = new WeakComponentClusterer<>();
+		Set<Set<Integer>>ccs= componentClusterer.transform(graphOverlap);
+		int ccId = 0;
+		for (Set<Integer> cc: ccs){
+			groupTerm.put(ccId++, cc);
+		}
+		return groupTerm;
+	}
 
 public static Map<Integer,Set<Integer>> getSupersetConceptRelationships (Map<Integer,Set<Integer>> conceptEvidenceMap){
 	Map <Integer,Set<Integer>> supersetConceptMap = new HashMap<Integer,Set<Integer>>();
 	for (Entry<Integer,Set<Integer>> entry1 : conceptEvidenceMap.entrySet()){
 		for (Entry<Integer,Set<Integer>> entry2 : conceptEvidenceMap.entrySet()){
 			if (entry1.getKey()!= entry2.getKey()&& entry1.getValue().size()!=entry2.getValue().size()){
-				Set<Integer> copy = new HashSet<Integer>(entry1.getValue());
+				Set<Integer> copy = new HashSet<>(entry1.getValue());
 				copy.retainAll(entry2.getValue());
 				if (copy.size()!=0){
-					boolean isSubset =(copy.size() == entry1.getValue().size()||copy.size() == entry2.getValue().size())?true:false;
+					boolean isSubset = (copy.size() == entry1.getValue().size() || copy.size() == entry2.getValue().size());
 					if (isSubset){
 						int subsetConceptId ;
 						int superSetConceptId; 
@@ -351,22 +380,18 @@ public static Map<Integer,Set<Integer>> getSupersetConceptRelationships (Map<Int
 						supersets.add(superSetConceptId);
 					}
 				}
-						
 			}
 		}
 	}
-	
 	return supersetConceptMap;
 }
-
-	
 	
 	public static Map<Integer,List<EntityAnnotation>> groupByItem(AnnotationMapping corSet){
-		HashMap<Integer,List<EntityAnnotation>> groups = new HashMap<Integer,List<EntityAnnotation>>();
+		HashMap<Integer,List<EntityAnnotation>> groups = new HashMap<>();
 		for (EntityAnnotation cor:corSet.getAnnotations()){
 			List<EntityAnnotation> umlsCon = groups.get(cor.getSrcId());
 			if (umlsCon==null){
-				umlsCon = new ArrayList<EntityAnnotation>();
+				umlsCon = new ArrayList<>();
 				groups.put(cor.getSrcId(), umlsCon);
 			}
 			umlsCon.add(cor);
@@ -376,17 +401,14 @@ public static Map<Integer,Set<Integer>> getSupersetConceptRelationships (Map<Int
 	
 	
 	
-	public static HashMap<Integer, List<Integer>> groupSimilarUMLSCons(EncodedEntityStructure umlsGroup,Set<GenericProperty> preRanAtts,int size, FormRepository gi) {
+	public static HashMap<Integer, List<Integer>> groupSimilarUMLSCons(EncodedEntityStructure umlsGroup,Set<GenericProperty> preRanAtts,
+																																		 int size,
+																																		 FormRepository gi) {
 		
 		
 		EncodedAnnotationMapping set =new EncodedAnnotationMapping();
 		Set<Integer> srcs = new HashSet<Integer>();
 		srcs.add(umlsGroup.getStructureId());
-//		Int2FloatMap idfMap = TFIDFTokenWeightGenerator.getInstance().generateIDFValues(srcs, size);
-//		Map<String,Object> externalObjects = new HashMap<String,Object>();
-//		externalObjects.put(TFIDFMatcher.IDF_MAP_SOURCE, idfMap);
-//		externalObjects.put(TFIDFMatcher.IDF_MAP_TARGET, idfMap);
-//		externalObjects.put(TFIDFMatcher.TFIDF_SOURCE_SEPARATED,false);
 		long time = System.currentTimeMillis();
 		MatchOperator mop = new MatchOperator (RegisteredMatcher.TRIGRAM_MATCHER, AggregationFunction.MAX, preRanAtts, preRanAtts, 0.35f);
 //		mop.setGlobalObjects(externalObjects);
@@ -402,6 +424,7 @@ public static Map<Integer,Set<Integer>> getSupersetConceptRelationships (Map<Int
 		HashMap <Integer,Node> nodeMap= new HashMap<Integer,Node>();
 		boolean isChange =true;
 		int counter =0;
+		/*
 		HashSet<EntityAnnotation> toRemoveCorrs = new HashSet<EntityAnnotation>();
 		for (EntityAnnotation c: set.getAnnotations()){
 			if (c.getSrcId()==c.getTargetId()){
@@ -410,6 +433,14 @@ public static Map<Integer,Set<Integer>> getSupersetConceptRelationships (Map<Int
 		}
 		for(EntityAnnotation c:toRemoveCorrs){
 			set.removeAnnotation(c.getSrcId(), c.getTargetId());
+		}*/
+
+		Iterator <EntityAnnotation> iter = set.getAnnotations().iterator();
+		while (iter.hasNext()){
+			EntityAnnotation c = iter.next();
+			if (c.getSrcId()==c.getTargetId()){
+				iter.remove();
+			}
 		}
 		
 		while(isChange&&counter<10000){
@@ -433,11 +464,7 @@ public static Map<Integer,Set<Integer>> getSupersetConceptRelationships (Map<Int
 							nodeMap.put(n2.ownId, n2);
 						}
 						int min = Math.min(n.minId, n2.minId);
-						if(n2.minId==min && n.minId==min){
-							isChange =false;
-						}else {
-							isChange =true;
-						}
+						isChange = !(n2.minId == min && n.minId == min);
 						n.minId = min;
 						n2.minId = min;
 					}
@@ -479,4 +506,9 @@ public static Map<Integer,Set<Integer>> getSupersetConceptRelationships (Map<Int
  class Node {
 	int ownId;
 	int minId;
+}
+
+class Edge {
+	int srcId ;
+	int targetId;
 }

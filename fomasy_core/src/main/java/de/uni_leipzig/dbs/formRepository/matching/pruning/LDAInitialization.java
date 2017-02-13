@@ -19,6 +19,7 @@ import de.uni_leipzig.dbs.formRepository.dataModel.GenericEntity;
 import de.uni_leipzig.dbs.formRepository.dataModel.GenericProperty;
 import de.uni_leipzig.dbs.formRepository.matching.preprocessing.PreprocessorConfig;
 import de.uni_leipzig.dbs.formRepository.matching.preprocessing.PreprocessorExecutor;
+import de.uni_leipzig.dbs.formRepository.matching.preprocessing.exception.PreprocessingException;
 
 public class LDAInitialization {
 
@@ -40,7 +41,11 @@ public class LDAInitialization {
 		
 		
 		PreprocessorExecutor pe = new PreprocessorExecutor();
-		pe.preprocess(ontology, config);
+		try {
+			pe.preprocess(ontology, config);
+		} catch (PreprocessingException e) {
+			e.printStackTrace();
+		}
 		this.instanceList = new InstanceList(new SerialPipes(pipeList));
 		Map<String, StringBuffer> semTypeDocuments = new HashMap<String,StringBuffer>(); 
 		for (GenericEntity ge : ontology.getEntities()){

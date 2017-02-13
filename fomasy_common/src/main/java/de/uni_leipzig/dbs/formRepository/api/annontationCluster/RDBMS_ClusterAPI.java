@@ -94,7 +94,7 @@ public class RDBMS_ClusterAPI implements ClusterAPI{
 		// TODO Auto-generated constructor stub
 	}
 
-	@Override
+
 	public Map<GenericEntity, EntitySet<GenericEntity>> getCluster(
 			Set<VersionMetadata> src, VersionMetadata target) throws EntityAPIException, ClusterAPIException {
 		Connection con = null;
@@ -152,7 +152,6 @@ public class RDBMS_ClusterAPI implements ClusterAPI{
 		}
 	}
 
-	@Override
 	public void importClusters(Map<GenericEntity, AnnotationCluster> clusters,
 			String name) throws ClusterAPIException {
 		Connection con = null;
@@ -219,7 +218,7 @@ public class RDBMS_ClusterAPI implements ClusterAPI{
 		
 	}
 
-	@Override
+
 	public Map<GenericEntity, AnnotationCluster> getDeterminedClusters(
 			String clusterConfigName) throws ClusterAPIException,
 			ClusterNotExistsException{
@@ -336,9 +335,7 @@ public class RDBMS_ClusterAPI implements ClusterAPI{
 		}
 		return map;
 	}
-	
-	
-	@Override
+
 	public Map<Integer,Map<Integer,Float>> getFormCooccurrences(String name, int common){
 		Map<Integer,Map<Integer,Float>> cooccurrenceMeasureMap = new HashMap<Integer,Map<Integer,Float>>();
 		try {

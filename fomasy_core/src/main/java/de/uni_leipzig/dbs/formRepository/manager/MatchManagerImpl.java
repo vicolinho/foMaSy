@@ -39,12 +39,14 @@ public class MatchManagerImpl implements MatchManager {
 		AnnotationMapping am = new AnnotationMapping();
 		am.setEvidenceMap(exec.getEvidenceMap());
 		Set<VersionMetadata> involvedStructures = new HashSet<VersionMetadata>();
-		involvedStructures.add(srcVersion.getMetadata());involvedStructures.add(targetVersion.getMetadata());
+		involvedStructures.add(srcVersion.getMetadata());
+		involvedStructures.add(targetVersion.getMetadata());
 		for (Entry<Long,Float> cor : encodedMapping.entrySet()){
 			int srcId = (int) CantorDecoder.decode_a(cor.getKey());
 			int targetId= (int) CantorDecoder.decode_b(cor.getKey());
 			EntityAnnotation ea = new EntityAnnotation (srcId, targetId,
-					srcVersion.getEntity(srcId).getAccession(), targetVersion.getEntity(targetId).getAccession(),cor.getValue(), false);
+					srcVersion.getEntity(srcId).getAccession(), targetVersion.getEntity(targetId).getAccession(),
+					cor.getValue(), false);
 			am.addAnnotation(ea);
 		}
 		return am;
@@ -66,17 +68,12 @@ public class MatchManagerImpl implements MatchManager {
 			EncodedEntityStructure encodedtarget, ExecutionTree tree,
 			Pruning pruning) throws MatchingExecutionException {
 		MatcherWorkflowExecuter exec = new 	MatcherWorkflowExecuter();
-		log.info(encodedSrc.getObjIds().size());
 		Long2FloatMap encodedMapping = exec.match(encodedSrc, encodedtarget, tree, pruning);
 		EncodedAnnotationMapping am = new EncodedAnnotationMapping();
-		log.info("match ready"+ encodedMapping.size());
-		
 		for (Entry<Long,Float> cor : encodedMapping.entrySet()){
 			EntityAnnotation ea= new EntityAnnotation(cor.getKey(), null, null, cor.getValue(), false);
 			am.addAnnotation(ea);
 		}
-		
-		
 		return am;
 	}
 

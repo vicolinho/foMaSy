@@ -25,7 +25,7 @@ public class NormalizePreprocessor implements Preprocessor {
 				
 				StringPropertyValueSet values = ge.getPropertyValueSet(pp.getName(), pp.getLang(),pp.getScope());
 				for (PropertyValue pv: values.getCollection()){
-					String value = pv.getValue().replaceAll(ALPHA_NUMERICAL_PATTERN.pattern(), "");
+					String value = pv.getValue().replaceAll(ALPHA_NUMERICAL_PATTERN.pattern(), " ");
 					value = value.replaceAll("\\s{2,}", " ");
 					pv.setValue(value);
 				}
@@ -44,7 +44,7 @@ public class NormalizePreprocessor implements Preprocessor {
 				
 				StringPropertyValueSet values = ge.getPropertyValueSet(pp.getName(), pp.getLang(),pp.getScope());
 				for (PropertyValue pv: values.getCollection()){
-					String value = pv.getValue().replaceAll(ALPHA_NUMERICAL_PATTERN.pattern(), "");
+					String value = pv.getValue().replaceAll(ALPHA_NUMERICAL_PATTERN.pattern(), " ");
 					value = value.replaceAll("\\s{2,}", " ");
 					pv.setValue(value);
 				}

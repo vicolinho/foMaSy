@@ -1,5 +1,6 @@
 package de.uni_leipzig.dbs.formRepository.evals;
 
+import de.uni_leipzig.dbs.formRepository.matching.preprocessing.exception.PreprocessingException;
 import it.unimi.dsi.fastutil.ints.Int2FloatMap;
 
 import java.io.IOException;
@@ -112,7 +113,11 @@ public class ReuseClusterWithStandardEvaluation {
 			int size = 0;
 			
 			for (EntityStructureVersion esv: set){
-				esv = executor.preprocess(esv, formConfig);
+				try {
+					esv = executor.preprocess(esv, formConfig);
+				} catch (PreprocessingException e) {
+					e.printStackTrace();
+				}
 				size += esv.getTypeCount().get("item");
 				EncodedEntityStructure ees = EncodingManager.getInstance().encoding(esv, true);
 				TFIDFTokenWeightGenerator.getInstance().initializeGlobalCount(ees, formMatchProperties.toArray(
@@ -315,6 +320,8 @@ public class ReuseClusterWithStandardEvaluation {
 			e.printStackTrace();
 		} catch (MatchingExecutionException e) {
 			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (PreprocessingException e) {
 			e.printStackTrace();
 		}
 	}

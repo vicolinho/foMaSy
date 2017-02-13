@@ -6,11 +6,12 @@ import java.util.Map.Entry;
 import de.uni_leipzig.dbs.formRepository.dataModel.EntitySet;
 import de.uni_leipzig.dbs.formRepository.dataModel.EntityStructureVersion;
 import de.uni_leipzig.dbs.formRepository.dataModel.GenericEntity;
+import de.uni_leipzig.dbs.formRepository.matching.preprocessing.exception.PreprocessingException;
 
 public class PreprocessorExecutor {
 
 	
-	public EntityStructureVersion preprocess (EntityStructureVersion esv , PreprocessorConfig config){
+	public EntityStructureVersion preprocess (EntityStructureVersion esv , PreprocessorConfig config) throws PreprocessingException {
 		PreprocessorFactory factory = new PreprocessorFactory();
 		for (PreprocessingSteps step: config.getOrder()){
 			List<PreprocessProperty> list = config.getPreprocessMap().get(step);

@@ -80,11 +80,10 @@ public class TrigramMatcher extends Matcher{
 			
 			}
 			int indexTarget =0;
-			for (int  domainObjID : target.getObjIds().keySet()) {
-				domObjIDsParts.get(indexTarget%threadNumber).add(domainObjID);
-				trigrams.get(indexTarget%threadNumber).add(target.getTrigramIds()[target.getObjIds().get(domainObjID)]);
+			for (int  targetObjID : target.getObjIds().keySet()) {
+				domObjIDsParts.get(indexTarget%threadNumber).add(targetObjID);
+				trigrams.get(indexTarget%threadNumber).add(target.getTrigramIds()[target.getObjIds().get(targetObjID)]);
 				indexTarget++;
-				
 			}
 			Integer [] sourceIds = new Integer[source.getObjIds().size()]; 
 			int index =0;
