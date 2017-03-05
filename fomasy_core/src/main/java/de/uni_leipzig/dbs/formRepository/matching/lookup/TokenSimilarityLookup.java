@@ -20,7 +20,8 @@ public class TokenSimilarityLookup {
 	private static TokenSimilarityLookup instance;
 	private Logger log = Logger.getLogger(getClass());
 	
-	public void computeTrigramLookup(Set<EntityStructureVersion> set, EntityStructureVersion target,FormRepository rep) throws MatchingExecutionException{
+	public void computeTrigramLookup(Set<EntityStructureVersion> set, EntityStructureVersion target,
+																	 FormRepository rep) throws MatchingExecutionException{
 		Set<String> words = new HashSet<String>();
 		EntityStructureVersion wordStructure = new EntityStructureVersion(new VersionMetadata(-2, null, null, null, null));
 		for (EntityStructureVersion esv:set){
@@ -103,7 +104,9 @@ public class TokenSimilarityLookup {
 	}
 	
 	
-	public void computeTrigramLookup(EntitySet<GenericEntity> src2, EntitySet<GenericEntity> target,Set<GenericProperty> srcProps, Set<GenericProperty> targetProps,FormRepository rep) throws MatchingExecutionException{
+	public void computeTrigramLookup(EntitySet<GenericEntity> src2,
+																	 EntitySet<GenericEntity> target,Set<GenericProperty> srcProps,
+																	 Set<GenericProperty> targetProps,FormRepository rep) throws MatchingExecutionException{
 		Set<String> words = new HashSet<String>();
 		EntityStructureVersion wordStructure = new EntityStructureVersion(new VersionMetadata(-2, null, null, null, null));
 		for (GenericEntity ge:src2){

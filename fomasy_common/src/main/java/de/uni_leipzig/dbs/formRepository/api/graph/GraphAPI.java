@@ -19,4 +19,7 @@ public interface GraphAPI {
 	
 	DirectedGraph <Node,Edge> getGraphFromStructure (EntitySet<GenericEntity> rootNodes,VersionMetadata structure,
 			int depth)throws GraphAPIException;
+
+	DirectedGraph <Node,Edge> getIsAConcepts(EntitySet<GenericEntity> rootNodes, VersionMetadata structure,
+																					 int depth)throws GraphAPIException;
 }

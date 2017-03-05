@@ -77,20 +77,20 @@ public class ReuseEvaluationWithContext {
 	static String[] generalConcepts = new String[]{"Qualitative Concept","Quantitative Concept",
 		"Functional Concept","Conceptual Entity","Temporal Concept"};
 	
-	/*
+
 	static int[] selectedForms = new int[]{2,3,8,9,10,
 		11,12,13,14,15,
 		16,20,21,76,77,
 		78,79,80,81,82,
 	83,84,85,86,87};
-*/
 
+/*
 	static int[] selectedForms = new int[]{1,2,7,8,9,
 										  10,11,12,13,14,
 										  15,19,20,75,76,
 										  77,78,79,80,81,
 										  82,83,84,85,86};
-
+*/
 //	439,440
 //	461,455,456,457,458,459,464,466,467,468,465,463,462,452,453,454,469,470,460,473,475,476
 //	static int[] selectedForms = new int[]{450, 451, 452, 453, 454, 455, 456, 457, 458, 459, 460, 461, 462, 463, 
@@ -191,7 +191,7 @@ public class ReuseEvaluationWithContext {
 			
 			formConfig.addPreprocessingStepForProperties(PreprocessingSteps.TO_LOW, propForms,propFormName);
 			formConfig.addPreprocessingStepForProperties(PreprocessingSteps.STOPWORD_EXTRACTION, propForms,propFormName);
-			formConfig.addPreprocessingStepForProperties(PreprocessingSteps.KEYWORD_EXTRACTION, propForms,propFormName);
+			formConfig.addPreprocessingStepForProperties(PreprocessingSteps.KEYWORD_EXTRACTION, propForms, propFormName);
 			PreprocessorExecutor executor = new PreprocessorExecutor();
 			int size = 0;
 			
@@ -250,7 +250,6 @@ public class ReuseEvaluationWithContext {
 					AggregationFunction.MAX, formMatchProperties, gp, threshold);
 			Map<String,Object> externalMap = new HashMap<String,Object>();
 			externalMap.put(TFIDFWindowMatcher.WND_SIZE, 5);
-			//externalMap.put(TFIDFWindowMatcher.IS_ADAPTIVE_SIZE, false);
 			Int2FloatMap idfMap = TFIDFTokenWeightGenerator.getInstance().generateIDFValuesForAllSources(size);
 			externalMap.put(TFIDFWindowMatcher.IDF_MAP_SOURCE, idfMap);
 			externalMap.put(TFIDFWindowMatcher.IDF_MAP_TARGET, idfMap);
@@ -343,7 +342,8 @@ public class ReuseEvaluationWithContext {
 						}
 						matchTime +=(System.currentTimeMillis()-restMatchTime);
 						long selStart = System.currentTimeMillis();
-						restAnno  =groupSelection.select(restAnno, ees1, umlsEnc, formProperties, umlsProperties, 0.35f, 0, avgEntitySize, rep);
+						restAnno  =groupSelection.select(restAnno, ees1, umlsEnc, formProperties, umlsProperties, 0.35f, 0,
+										avgEntitySize, rep);
 						reuseAnno = graphBasedSelection.selectAnnotationMapping(unionGraph, reuseAnno, ees1,
 								umlsEnc, formProperties, gp, 0.35f, 0,avgEntitySize, rep);
 						selectionTime +=(System.currentTimeMillis()-selStart);

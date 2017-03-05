@@ -28,6 +28,7 @@ public class MatcherFactory {
 		this.registerMatcher(RegisteredMatcher.TFIDF_WINDOW_MATCHER, "de.uni_leipzig.dbs.formRepository.matching.token.TFIDFWindowMatcher");
 		this.registerMatcher(RegisteredMatcher.LCS_MATCHER, "de.uni_leipzig.dbs.formRepository.matching.token.LCSMatcher");
 		this.registerMatcher(RegisteredMatcher.SOFT_TFIDF_WND_MATCHER, "de.uni_leipzig.dbs.formRepository.matching.token.SoftTFIDFMatcher");
+		this.registerMatcher(RegisteredMatcher.EXACT_MATCHER,  "de.uni_leipzig.dbs.formRepository.matching.exact.ExactMatcher");
 	}
 	
 	public void registerMatcher (String name, String classLocation){

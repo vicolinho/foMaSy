@@ -31,4 +31,8 @@ public class GraphManagerImpl implements GraphManager {
 		return APIFactory.getInstance().getGraphAPI().getGraphFromStructure(rootNodes, structure, depth);
 	}
 
+	public DirectedGraph <Node,Edge> getIsAConcepts (EntitySet<GenericEntity> rootNodes,VersionMetadata structure,
+																									 int depth)throws GraphAPIException{
+		return APIFactory.getInstance().getGraphAPI().getIsAConcepts(rootNodes, structure, depth);
+	}
 }

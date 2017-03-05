@@ -4,18 +4,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import it.unimi.dsi.fastutil.ints.*;
 import org.apache.log4j.Logger;
 
 import de.uni_leipzig.dbs.formRepository.dataModel.GenericProperty;
 import de.uni_leipzig.dbs.formRepository.dataModel.encoding.EncodedEntityStructure;
-import it.unimi.dsi.fastutil.ints.Int2FloatMap;
-import it.unimi.dsi.fastutil.ints.Int2FloatOpenHashMap;
-import it.unimi.dsi.fastutil.ints.Int2IntMap;
-import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
-import it.unimi.dsi.fastutil.ints.IntSet;
 
 public class TFIDFTokenWeightGenerator implements WeightGenerator {
 
@@ -59,14 +52,16 @@ public class TFIDFTokenWeightGenerator implements WeightGenerator {
 	
 	public void initializeGlobalCount (EncodedEntityStructure ees, GenericProperty... props){
 		int [] positions = new int[props.length];
+		IntList propList = new IntArrayList();
 		Int2IntMap countMap= new Int2IntOpenHashMap();
 		this.globalCountMap.put(ees.getStructureId(), countMap);
 		for (int i= 0;i<props.length;i++){
-			positions[i] = ees.getPropertyPosition().get(props[i]);
+			if (ees.getPropertyPosition().get(props[i])!=null)
+				propList.add(ees.getPropertyPosition().get(props[i]));
 		}
+		positions = propList.toIntArray();
 		IntSet set = new IntOpenHashSet();
 		for (int[][][]propValues: ees.getPropertyValueIds()){
-			
 			for (int pos:positions){
 				int[][] values = propValues[pos];
 				for (int[]v:values){

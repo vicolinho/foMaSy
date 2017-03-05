@@ -19,13 +19,13 @@ import de.uni_leipzig.dbs.formRepository.exception.VersionNotExistsException;
 
 public interface FormManager {
 
-	public void importForm (String file) throws FileNotFoundException, IOException, InstantiationException, IllegalAccessException, ClassNotFoundException, ImportException;
+	void importForm(String file) throws IOException, InstantiationException, IllegalAccessException, ClassNotFoundException, ImportException;
 	
-	public void importForm(Map<String,Object> properties) throws InstantiationException, IllegalAccessException,
+	void importForm(Map<String, Object> properties) throws InstantiationException, IllegalAccessException,
 	ClassNotFoundException, ImportException;
 	
 	
-	public void importRelationshipsForVersion (Map<String, Object> properties) throws InstantiationException, 
+	void importRelationshipsForVersion(Map<String, Object> properties) throws InstantiationException,
 	IllegalAccessException, ClassNotFoundException, ImportException;
 	
 	/**
@@ -37,7 +37,11 @@ public interface FormManager {
 	 * @throws VersionNotExistsException
 	 * @throws StructureBuildException
 	 */
-	public EntityStructureVersion getStructureVersion (String name,String type, String version) throws VersionNotExistsException, StructureBuildException;
+	EntityStructureVersion getStructureVersion(String name, String type, String version)
+					throws VersionNotExistsException, StructureBuildException;
+
+	EntityStructureVersion getStructureVersion(String name, String type, String version,
+																						 Set<GenericProperty> usedProps) throws VersionNotExistsException, StructureBuildException;
 	/**
 	 * 
 	 * @param name of the entity structure
@@ -46,7 +50,7 @@ public interface FormManager {
 	 * @throws VersionNotExistsException
 	 * @throws StructureBuildException
 	 */
-	public EntityStructureVersion getLatestStructureVersion (String name,String type);
+	EntityStructureVersion getLatestStructureVersion(String name, String type);
 	
 	/**
 	 * 
@@ -55,7 +59,7 @@ public interface FormManager {
 	 * @throws VersionNotExistsException
 	 * @throws StructureBuildException
 	 */
-	public Set<EntityStructureVersion> getStructureVersionsByType (Set<String> types) throws VersionNotExistsException, StructureBuildException;
+	Set<EntityStructureVersion> getStructureVersionsByType(Set<String> types) throws VersionNotExistsException, StructureBuildException;
 	
 	/**
 	 * 
@@ -63,20 +67,22 @@ public interface FormManager {
 	 * @return an set of Entities 
 	 * @throws EntityAPIException
 	 */
-	public EntitySet<GenericEntity> getEntitiesById (Set<Integer> ids) throws EntityAPIException;
+	EntitySet<GenericEntity> getEntitiesById(Set<Integer> ids) throws EntityAPIException;
 	
 	
 	
-	public VersionMetadata getMetadata(String name,String type, String version) throws VersionNotExistsException;
+	VersionMetadata getMetadata(String name, String type, String version) throws VersionNotExistsException;
 
-	public Set<GenericProperty> getAvailableProperties (String name, String from, String type);
+	Set<GenericProperty> getAvailableProperties(String name, String from, String type);
 
 	EntitySet<GenericEntity> getEntitiesByIdWithProperties(Set<Integer> ids)
 			throws EntityAPIException;
 
-	public EntitySet<GenericEntity> getEntityWithPropertiesByAccession(Set<String> accs) throws EntityAPIException;
+	EntitySet<GenericEntity> getEntityWithPropertiesByAccession(Set<String> accs) throws EntityAPIException;
 
 	EntitySet<GenericEntity> getEntitiesByPropertyWithProperties(
 			Set<String> values, VersionMetadata vm, Set<GenericProperty> gps)
 			throws EntityAPIException;
+
+	Map<String,Integer> getIdMapping(String name, String date, String type);
 }

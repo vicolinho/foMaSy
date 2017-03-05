@@ -1,8 +1,11 @@
 package de.uni_leipzig.dbs.formRepository.dataModel;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Set;
+
+import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
+import it.unimi.dsi.fastutil.ints.IntSet;
+
+
+import java.util.*;
 
 public class EntityStructureVersion {
 
@@ -184,6 +187,45 @@ public class EntityStructureVersion {
 		} else if (!metadata.equals(other.metadata))
 			return false;
 		return true;
+	}
+
+	public void deduplicateProperties(Set<GenericProperty> propsTarget){
+		Map<String, IntSet> pvs = new HashMap<>();
+
+		for (GenericEntity ge: this.getEntities()){
+			for (GenericProperty gp : propsTarget) {
+				List<String> pv = ge.getPropertyValues(gp);
+				for (String v: pv){
+					IntSet ids = pvs.get(v);
+					if (ids ==null){
+						ids = new IntOpenHashSet();
+						pvs.put(v,ids);
+					}
+					ids.add(ge.getId());
+				}
+			}
+		}
+
+		for (Map.Entry<String, IntSet>e :pvs.entrySet()){
+			if (e.getValue().size()>1){
+				for (int id :e.getValue()){
+					for (GenericProperty gp : propsTarget) {
+						GenericEntity ge = this.getEntity(id);
+						List<PropertyValue> newList = ge.getValues(gp);
+						Iterator<PropertyValue> iter = newList.iterator();
+						while (iter.hasNext()){
+							PropertyValue p =iter.next();
+							if (p.getValue().equals(e.getKey())){
+								iter.remove();
+							}
+						}
+						ge.changePropertyValues(gp,newList);
+					}
+				}
+			}
+
+		}
+
 	}
 	
 }

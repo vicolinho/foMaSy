@@ -47,34 +47,36 @@ public class StopwordPreprocessor implements Preprocessor {
 			for (GenericEntity ge: esv.getEntities()){
 				
 				for (PreprocessProperty pp: propList){
-					
-					StringPropertyValueSet values = ge.getPropertyValueSet(pp.getName(), pp.getLang(),pp.getScope());
-					for (PropertyValue pv: values.getCollection()){
-						nextStart = 0;
-						String value = pv.getValue();
-						Matcher m = WORD_PATTERN.matcher(value);
+					Set<GenericProperty> gps = ge.getGenericProperties(pp.getName(), pp.getLang(),pp.getScope());
+					for (GenericProperty gp: gps) {
+						List<PropertyValue> pvs = ge.getValues(gp);
+						for (PropertyValue pv : pvs) {
+							nextStart = 0;
+							String value = pv.getValue();
+							Matcher m = WORD_PATTERN.matcher(value);
 						/*for (String stopWord: stopWords){
 							value = value.replaceAll("\\b"+stopWord+"\\b", "");
 						}*/
-						
-						while (m.find()){
-							String sw = m.group();
-							if (stopWords.contains(sw)){
-								//currentEnd = m.start();
-								//sb.append(value.substring(nextStart, currentEnd));
-								value= value.replaceAll("\\b"+sw+"\\b", "");
-								//nextStart = m.end();
+
+							while (m.find()) {
+								String sw = m.group();
+								if (stopWords.contains(sw)) {
+									//currentEnd = m.start();
+									//sb.append(value.substring(nextStart, currentEnd));
+									value = value.replaceAll("\\b" + sw + "\\b", "");
+									//nextStart = m.end();
+								}
 							}
+							//if (currentEnd!=0){
+							//	sb.append(value.substring(nextStart,value.length()));
+							//}
+							pv.setValue(value.replaceAll("\\s{2,}", " "));
+							//if (sb.length()!=0)
+							//	sb.delete(0, sb.length());
+
 						}
-						//if (currentEnd!=0){
-						//	sb.append(value.substring(nextStart,value.length()));
-						//}
-						pv.setValue(value.replaceAll("\\s{2,}", " "));
-						//if (sb.length()!=0)
-						//	sb.delete(0, sb.length());
-						
+						ge.changePropertyValues(gp,pvs);
 					}
-					ge.changePropertyValues(values);
 				}
 			}
 		} catch (FileNotFoundException e) {
@@ -128,34 +130,34 @@ public class StopwordPreprocessor implements Preprocessor {
 			for (GenericEntity ge: esv){
 				
 				for (PreprocessProperty pp: propList){
-					
-					StringPropertyValueSet values = ge.getPropertyValueSet(pp.getName(), pp.getLang(),pp.getScope());
-					for (PropertyValue pv: values.getCollection()){
-						nextStart = 0;
-						String value = pv.getValue();
-						Matcher m = WORD_PATTERN.matcher(value);
+					Set<GenericProperty> gps = ge.getGenericProperties(pp.getName(), pp.getLang(),pp.getScope());
+					for (GenericProperty gp: gps) {
+						List<PropertyValue> pvs = ge.getValues(gp);
+						for (PropertyValue pv : pvs) {
+							nextStart = 0;
+							String value = pv.getValue();
+							Matcher m = WORD_PATTERN.matcher(value);
 						/*for (String stopWord: stopWords){
 							value = value.replaceAll("\\b"+stopWord+"\\b", "");
 						}*/
-						
-						while (m.find()){
-							String sw = m.group();
-							if (stopWords.contains(sw)){
-								//currentEnd = m.start();
-								//sb.append(value.substring(nextStart, currentEnd));
-								value= value.replaceAll("\\b"+sw+"\\b", "");
-								//nextStart = m.end();
+
+							while (m.find()) {
+								String sw = m.group();
+								if (stopWords.contains(sw)) {
+									value = value.replaceAll("\\b" + sw + "\\b", "");
+									//nextStart = m.end();
+								}
 							}
+							//if (currentEnd!=0){
+							//	sb.append(value.substring(nextStart,value.length()));
+							//}
+							pv.setValue(value.replaceAll("\\s{2,}", " "));
+							//if (sb.length()!=0)
+							//	sb.delete(0, sb.length());
+
 						}
-						//if (currentEnd!=0){
-						//	sb.append(value.substring(nextStart,value.length()));
-						//}
-						pv.setValue(value.replaceAll("\\s{2,}", " "));
-						//if (sb.length()!=0)
-						//	sb.delete(0, sb.length());
-						
+						ge.changePropertyValues(gp,pvs);
 					}
-					ge.changePropertyValues(values);
 				}
 			}
 		} catch (FileNotFoundException e) {

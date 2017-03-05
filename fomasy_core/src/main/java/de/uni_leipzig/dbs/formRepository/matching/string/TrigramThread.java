@@ -104,6 +104,9 @@ public class TrigramThread extends AbstractPartMatcher{
 					}
 				}
 				float sim = aggFunc.aggregateFloatList(confidenceList);
+				if (sim>1){
+					log.error("sim greater than 1: " +sim);
+				}
 				this.addResult(srcStructure.getStructureId(), targetStructure.getStructureId(), entitySrcId, te, sim);
 				confidenceList.clear();
 				targetIndex++;
@@ -133,7 +136,7 @@ public class TrigramThread extends AbstractPartMatcher{
 		}
 		
 		
-		float dice = (2*common)/(float)(trigramSrc.length+triTarget.length);
+		float dice = (2f*common)/(float)(trigramSrc.length+triTarget.length);
 		return dice;
 	}
 	

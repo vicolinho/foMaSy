@@ -60,7 +60,7 @@ public class NumberFilterTest {
   @Test
   public void testEncoding() {
     Assert.assertEquals("HbA1c greater than or equal to and" +
-            " less than or equal to", esv.getEntity(0).getPropertyValues(gp).get(0));
+            " less than or equal to%", esv.getEntity(0).getPropertyValues(gp).get(0));
 
   }
 

@@ -6,9 +6,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Set;
 
+import it.unimi.dsi.fastutil.Hash;
 import org.apache.log4j.Logger;
 
 import it.unimi.dsi.fastutil.longs.Long2FloatMap;
@@ -107,8 +110,8 @@ public class RDBMS_AnnotationAPI implements AnnotationAPI {
 			 }
 			 am.setMethod(method);
 			 am.setName(name);
-			 am.setSrcVersion(src);;
-			 am.setTargetVersion(target);
+			 am.setSrcVersion(src);
+			am.setTargetVersion(target);
 			 pstmt.close();
 			 PreparedStatement annStmt = con.prepareStatement(GET_ANNOTATIONS_FOR_MAPPING);
 			 annStmt.setInt(1, structId);
@@ -206,6 +209,7 @@ public class RDBMS_AnnotationAPI implements AnnotationAPI {
 			
 			PreparedStatement pstmtAnno = null;
 			pstmtAnno = con.prepareStatement(INSERT_ANNOS);
+			int notInserted =0;
 			for (List<ImportAnnotation> a : iam.getAnnotations().values()){
 				for (ImportAnnotation an:a){
 					try {
@@ -217,6 +221,9 @@ public class RDBMS_AnnotationAPI implements AnnotationAPI {
 						
 						int change = pstmtAnno.executeUpdate();
 						if (change ==0){
+							if (an.getTargetAccession().matches("C[0-9]{7}")){
+								notInserted++;
+							}
 							//log.warn(an.getSrcAccession()+" "+an.getTargetAccession() +" not inserted");
 						}
 					} catch (SQLException e1) {
@@ -224,8 +231,8 @@ public class RDBMS_AnnotationAPI implements AnnotationAPI {
 						e1.printStackTrace();
 					} 
 				}
-				
 			}
+			log.info("number of missing codes:"+notInserted);
 			pstmtAnno.close();	
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block

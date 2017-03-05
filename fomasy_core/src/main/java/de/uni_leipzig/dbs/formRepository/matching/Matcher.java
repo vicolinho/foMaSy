@@ -34,10 +34,12 @@ public abstract class Matcher {
 		propertyIds1 = new HashSet<Integer>();
 		propertyIds2 = new HashSet<Integer>();
 		for (GenericProperty gp:comparingProp1){
-			propertyIds1.add(propMap1.get(gp));
+			if (propMap1.get(gp)!=null)
+				propertyIds1.add(propMap1.get(gp));
 		}
 		for (GenericProperty gp: comparingProp2){
-			propertyIds2.add(propMap2.get(gp));
+			if (propMap2.get(gp)!=null)
+				propertyIds2.add(propMap2.get(gp));
 		}
 		this.result = new Long2FloatOpenHashMap();
 		this.evidenceMap = new Long2ObjectOpenHashMap<Set<Integer>>();

@@ -260,7 +260,7 @@ public class BaselineEvaluation{
           aw.writeAnnotation(map.get(ees1.getStructureId()),umls, restAnno, formProperties, umlsProperties,
                  "mappings/"+map.get(ees1.getStructureId()).getMetadata().getName()+"_3.csv");
           log.info("before selection:"+restAnno.getNumberOfAnnotations());
-          restAnno = groupSelection.select(restAnno,ees1, umlsEnc, formProperties, null, 0.35f, 0, 2f, rep);
+          restAnno = groupSelection.select(restAnno,ees1, umlsEnc, formProperties, null, 0.3f, 0, 2f, rep);
           log.info("after selection:"+restAnno.getNumberOfAnnotations());
           long selStart = System.currentTimeMillis();
           annoMap.put(ees1.getStructureId(), restAnno);

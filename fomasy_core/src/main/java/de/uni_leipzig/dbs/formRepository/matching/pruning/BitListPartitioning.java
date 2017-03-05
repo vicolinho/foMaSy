@@ -34,8 +34,8 @@ public class BitListPartitioning implements Pruning{
 		List <BitSet> bitListsPerPartition = new ArrayList<BitSet>();
 		List <int[]>partitions = new ArrayList<int[]>();
 		EntityComparator comp = new EntityComparator(orderAttribute);
-		Int2IntMap eMap = (Int2IntMap)ees.getObjIds();
-		int[][][][] triIds = (int[][][][]) ees.getTrigramIds();
+		Int2IntMap eMap = ees.getObjIds();
+		int[][][][] triIds = ees.getTrigramIds();
 		List<GenericEntity> ents = new ArrayList<GenericEntity>(esv.getEntities());
 		//ents.sort(comp);
 		int counter =0;
@@ -147,12 +147,12 @@ public class BitListPartitioning implements Pruning{
 			String value1 ="";
 			String value2 ="";
 			try{
-				value1 = o1.getStringValues(orderProperty).get(0);
+				value1 = o1.getPropertyValues(orderProperty).get(0);
 			}catch(ArrayIndexOutOfBoundsException e){
 				
 			}catch (NullPointerException e){}
 			try{
-				value2 = o2.getStringValues(orderProperty).get(0);
+				value2 = o2.getPropertyValues(orderProperty).get(0);
 			}catch(ArrayIndexOutOfBoundsException e){
 				
 			}catch (NullPointerException e){}

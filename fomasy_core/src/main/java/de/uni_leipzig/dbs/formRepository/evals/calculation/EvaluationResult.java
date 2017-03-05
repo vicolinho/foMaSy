@@ -38,6 +38,9 @@ public class EvaluationResult {
 		this.setSrcName(srcName);
 		this.setTargetName(targetName);
 		this.measures = new HashMap<String,Float>();
+		measures.put("precision", -1f);
+		measures.put("recall", -1f);
+		measures.put("fmeasure", -1f);
 	}
 
 
@@ -82,6 +85,25 @@ public class EvaluationResult {
 		this.measures.put("fmeasure", fmeasure);
 	}
 
+	@Override
+	public String toString() {
+		return truePositive.getNumberOfAnnotations() +System.getProperty("line.separator")+
+						falsePositives.getNumberOfAnnotations() +System.getProperty("line.separator")+
+						falseNegative.getNumberOfAnnotations() +System.getProperty("line.separator")+
+						this.measures.get("precision") +System.getProperty("line.separator")+
+						this.measures.get("recall") +System.getProperty("line.separator")+
+						this.measures.get("fmeasure") +System.getProperty("line.separator");
+	}
+
+	public String[] toStringArray(){
+		String[] resVec = new String[]{truePositive.getNumberOfAnnotations()+"",
+						falsePositives.getNumberOfAnnotations()+"",
+						falseNegative.getNumberOfAnnotations()+"",
+						this.measures.get("precision")+"",
+						this.measures.get("recall")+"",
+						this.measures.get("fmeasure")+""};
+		return resVec;
+	}
 
 	public String getSrcName() {
 		return srcName;

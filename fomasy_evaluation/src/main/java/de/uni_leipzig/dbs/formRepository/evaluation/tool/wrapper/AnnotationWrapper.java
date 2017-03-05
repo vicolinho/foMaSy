@@ -2,6 +2,7 @@ package de.uni_leipzig.dbs.formRepository.evaluation.tool.wrapper;
 
 import de.uni_leipzig.dbs.formRepository.dataModel.AnnotationMapping;
 import de.uni_leipzig.dbs.formRepository.dataModel.EntityStructureVersion;
+import de.uni_leipzig.dbs.formRepository.evaluation.exception.AnnotationException;
 
 import java.util.Properties;
 
@@ -11,5 +12,5 @@ import java.util.Properties;
 public interface AnnotationWrapper {
 
 
-  AnnotationMapping computeMapping(EntityStructureVersion esv, Properties prop);
+  AnnotationMapping computeMapping(EntityStructureVersion esv, Properties prop) throws AnnotationException;
 }

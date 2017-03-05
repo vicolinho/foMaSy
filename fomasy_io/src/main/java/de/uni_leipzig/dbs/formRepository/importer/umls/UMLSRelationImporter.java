@@ -14,13 +14,15 @@ import de.uni_leipzig.dbs.formRepository.dataModel.importer.ImportRelationship;
 import de.uni_leipzig.dbs.formRepository.exception.ImportException;
 import de.uni_leipzig.dbs.formRepository.importer.EntityStructureImporter;
 import de.uni_leipzig.dbs.formRepository.importer.PreSourceImporter;
-
+import org.apache.log4j.Logger;
 
 
 public class UMLSRelationImporter extends PreSourceImporter{
 	Connection con;
 
-	public static final String RELEVANT_RELATIONS = "SELECT CUI1, CUI2, RELA FROM MRREL where RELA is not null AND"
+	Logger log = Logger.getLogger(getClass());
+
+	public static final String RELEVANT_RELATIONS = "SELECT CUI2, CUI1, RELA FROM MRREL where RELA is not null AND"
 			+ " RELA  not in ('inverse_isa','same_as','mapped_to') AND CUI1!=CUI2";
 	@Override
 	protected void loadSourceData() throws ImportException {
@@ -32,11 +34,11 @@ public class UMLSRelationImporter extends PreSourceImporter{
 			String user = importer.getUser();
 			String pw = importer.getPw();
 			String source =importer.getSource();
-		
 			con = null;
 			try {
 				con = DriverManager.getConnection(source, user, pw);
 				this.rels = this.getRelations();
+				log.info("retrieved "+this.rels.size() +" relations");
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -50,7 +52,6 @@ public class UMLSRelationImporter extends PreSourceImporter{
 				}
 			}
 		}
-		
 	}
 
 	private List<ImportRelationship> getRelations() throws SQLException {

@@ -229,10 +229,12 @@ public class RDBMS_EntityStructureImportAPI implements EntityStructureImportAPI 
 					prepareStatement(INSERT_TMP_RELS);
 			int batchSize = 5000;
 			int currentSize =0;
+			con.setAutoCommit(false);
 				for (ImportRelationship r: importRelationships){
 					if (currentSize ==batchSize){
 						pstmtEnt.executeBatch();
 						pstmtEnt.clearBatch();
+						con.commit();
 						currentSize =0;
 					}
 					
@@ -241,14 +243,17 @@ public class RDBMS_EntityStructureImportAPI implements EntityStructureImportAPI 
 					pstmtEnt.setString(3, r.getType());
 					pstmtEnt.setBoolean(4, r.isDirected());
 					pstmtEnt.addBatch();
+
 					currentSize++;
 				}
 				
 				if (currentSize!=0){
 					pstmtEnt.executeBatch();
 					pstmtEnt.clearBatch();
+					con.commit();
 					pstmtEnt.close();
 				}
+				con.setAutoCommit(true);
 				con.close();
 		}catch (SQLException e) {
 			

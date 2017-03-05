@@ -9,11 +9,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import org.apache.log4j.Logger;
 
@@ -66,6 +62,8 @@ public class RDBMS_EntityStructureAPI implements EntityStructureAPI {
 			+ " e.ent_struct_id_fk =? AND "
 			+ " (? Between pv.from_date AND pv.to_date)"
 			+ " AND (? Between pv.from_date AND pv.to_date) ";
+
+
 	public static final String GET_AVAILABLE_PROPERTIES = "Select DISTINCT p.prop_id, p.prop_name, p.lang, p.scope from entity e, property p, property_value pv where"
 			+ " e.ent_id = pv.ent_id_fk AND "
 			+ " pv.prop_id_fk = p.prop_id AND "
@@ -137,13 +135,68 @@ public class RDBMS_EntityStructureAPI implements EntityStructureAPI {
 	}
 
 	@Override
+	public EntityStructureVersion getEntityStructureVersion(String name, String type,
+			String date, Set<GenericProperty> usedProps) throws VersionNotExistsException, StructureBuildException {
+		Connection con = null;PreparedStatement pstmt =null;
+		try {
+			con = DBConHandler.getInstance().getConnection();
+			pstmt = con.prepareStatement(GET_VERSION_WITHIN_DATE);
+			pstmt.setString(1, name);
+			pstmt.setString(2, type);
+			pstmt.setString(3, date);
+			ResultSet rs = pstmt.executeQuery();
+			int structId;
+			String from ;
+			String to;
+			if (rs.next()){
+				structId = rs.getInt(1);
+				from = DateFormatter.getFormattedDate(rs.getDate(2));
+				to = DateFormatter.getFormattedDate(rs.getDate(3));
+
+			}else {
+				throw new VersionNotExistsException ("version with name:"+ name+
+								", type:"+type +" and for the date:"+date+" doesn't exists");
+			}
+			VersionMetadata metadata = new VersionMetadata (structId,DateFormatter.getDate(from),
+							DateFormatter.getDate(to),name,type);
+			EntityStructureVersion structure = new EntityStructureVersion(metadata);
+			List <GenericEntity> entities = this.getEntities(con, structId, from, to);
+			for (GenericEntity e : entities){
+				structure.addEntity(e);
+			}
+			log.debug("retrieve entities:"+ entities.size());
+			structure = this.addRelationships(con,structure, structId, from, to);
+			structure = this.addProperties(con, structure, structId, usedProps, from, to);
+			log.debug("load property values");
+			//structure = this.addAvailableProperties(con, structure, structId, from, to);
+			pstmt.close();
+			con.close();
+			return structure;
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}finally {
+			try {
+				pstmt.close();
+				con.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
+		return null;
+	}
+
+	@Override
 	public EntityStructureVersion getLatestStructureVersion(String name,
 			String type) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 	
-	private List<GenericEntity> getEntities (Connection con, int struct_id, String from ,String to) throws StructureBuildException{
+	private List<GenericEntity> getEntities (Connection con, int struct_id,
+ 			String from ,String to) throws StructureBuildException{
 		List<GenericEntity> ents = new ArrayList<GenericEntity>();
 		try {
 			PreparedStatement stmt = con.prepareStatement(GET_ENTITIES);
@@ -165,7 +218,8 @@ public class RDBMS_EntityStructureAPI implements EntityStructureAPI {
 		return ents;
 	}
 	
-	private EntityStructureVersion addRelationships (Connection con, EntityStructureVersion esv, int struct_id, String from, String to) throws StructureBuildException{
+	private EntityStructureVersion addRelationships (Connection con, EntityStructureVersion esv,
+			int struct_id, String from, String to) throws StructureBuildException{
 		try {
 			PreparedStatement pstmt = con.prepareStatement(GET_RELS);
 			pstmt.setInt(1, struct_id);
@@ -185,7 +239,8 @@ public class RDBMS_EntityStructureAPI implements EntityStructureAPI {
 		return esv;
 	}
 	
-	private EntityStructureVersion addAvailableProperties (Connection con, EntityStructureVersion esv, int struct_id, String from, String to) throws StructureBuildException{
+	private EntityStructureVersion addAvailableProperties (Connection con, EntityStructureVersion esv,
+			int struct_id, String from, String to) throws StructureBuildException{
 		try {
 			PreparedStatement pstmt = con.prepareStatement(GET_AVAILABLE_PROPERTIES);
 			pstmt.setInt(1, struct_id);
@@ -211,7 +266,8 @@ public class RDBMS_EntityStructureAPI implements EntityStructureAPI {
 		
 	}
 	
-	private EntityStructureVersion addProperties (Connection con, EntityStructureVersion esv, int struct_id, String from, String to) throws StructureBuildException{
+	private EntityStructureVersion addProperties (Connection con, EntityStructureVersion esv,
+			int struct_id, String from, String to) throws StructureBuildException{
 		try {
 			PreparedStatement pstmt = con.prepareStatement(GET_PROPERTIES);
 			pstmt.setInt(1, struct_id);
@@ -246,6 +302,63 @@ public class RDBMS_EntityStructureAPI implements EntityStructureAPI {
 			throw new StructureBuildException ("error by loading properties");
 		}
 		return esv;
+	}
+
+	private EntityStructureVersion addProperties (Connection con, EntityStructureVersion esv, int struct_id,
+						Set<GenericProperty> props, String from, String to) throws StructureBuildException{
+		try {
+			PreparedStatement pstmt = con.prepareStatement(GET_PROPERTIES);
+			pstmt.setInt(1, struct_id);
+			pstmt.setString(2, from);
+			pstmt.setString(3, to);
+			ResultSet rs = pstmt.executeQuery();
+			IntSet avProperties = new IntOpenHashSet();
+			while (rs.next()){
+				int propId = rs.getInt(1);
+				String propName = rs.getString(2);
+				String lang = rs.getString(3);
+				String scope = rs.getString(4);
+				int pvid= rs.getInt(6);
+				String propValue = rs.getString(7);
+				if (!propValue.isEmpty()){
+					GenericProperty property = new GenericProperty(propId,propName, scope, lang);
+					if (this.isPropertyUsed(props, property)) {
+						PropertyValue pv = new PropertyValue(pvid, propValue);
+						GenericEntity ent = esv.getEntity(rs.getInt(5));
+						ent.addPropertyValue(property, pv);
+						if (!avProperties.contains(propId)) {
+							avProperties.add(propId);
+							esv.addAvailableProperty(property);
+						}
+					}
+				}
+			}
+			rs.close();
+			pstmt.close();
+			for (GenericEntity ge: esv.getEntities()){
+				if (ge.getProperties().isEmpty()){
+					esv.removeEntity(ge.getId());
+				}
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			throw new StructureBuildException ("error by loading properties");
+		}
+		return esv;
+	}
+
+	private boolean isPropertyUsed (Set<GenericProperty> usedProps, GenericProperty fetchedProperty){
+		for (GenericProperty gp: usedProps){
+			if (gp.getName()!=null && fetchedProperty.getName() !=null){
+				if (gp.getName().equals(fetchedProperty.getName())&&
+								gp.getScope().equals(fetchedProperty.getScope())&&
+								gp.getLanguage().equals(fetchedProperty.getLanguage())){
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	@Override
@@ -359,6 +472,51 @@ public class RDBMS_EntityStructureAPI implements EntityStructureAPI {
 		
 	}
 
-	
+	@Override
+	public Map<String, Integer> getIdMapping(String name, String date, String type) {
+		Map<String,Integer> ents = new HashMap<>();
+		PreparedStatement pstmt =null;
+		Connection con =null;
+		try {
+			con = DBConHandler.getInstance().getConnection();
+			pstmt = con.prepareStatement(GET_VERSION_WITHIN_DATE);
+			pstmt.setString(1, name);
+			pstmt.setString(2, type);
+			pstmt.setString(3, date);
+			ResultSet rs = pstmt.executeQuery();
+			int structId;
+			String from ;
+			String to;
+			if (rs.next()){
+				structId = rs.getInt(1);
+				from = DateFormatter.getFormattedDate(rs.getDate(2));
+				to = DateFormatter.getFormattedDate(rs.getDate(3));
+				PreparedStatement stmt = con.prepareStatement(GET_ENTITIES);
+				stmt.setInt(1, structId);
+				stmt.setString(2, from);
+				stmt.setString(3, to);
+				ResultSet rs2 = stmt.executeQuery();
+				while(rs2.next()){
+					ents.put(rs2.getString(2),rs2.getInt(1));
+				}
+				rs2.close();
+				stmt.close();
+
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+
+		}finally {
+			try {
+				pstmt.close();
+				con.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		return ents;
+	}
+
 
 }

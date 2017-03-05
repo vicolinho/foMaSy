@@ -64,6 +64,10 @@ public class EncodedAnnotationMapping {
 		long c = CantorDecoder.code(srcId, targetId);
 		return this.annotations.get(c);
 	}
+
+	public EntityAnnotation getAnnotation (long aid){
+		return this.annotations.get(aid);
+	}
 /*
 	public boolean contains(EntityAnnotation am){
 		return this.annotations.containsKey(am.getId());

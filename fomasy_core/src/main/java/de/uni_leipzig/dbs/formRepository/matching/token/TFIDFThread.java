@@ -231,8 +231,7 @@ public class TFIDFThread extends AbstractPartMatcher{
 			System.out.println(weightedSum1+"\t"+simpleLength1);
 			System.out.println(weightedSum2+"\t"+simpleLength2);
 			System.out.println("hamming:"+hamConfidence);
-		}//System.out.println("hamming:"+hamConfidence);
-		//
+		}
 		return Double.isNaN(hamConfidence) ? 0f : (float) hamConfidence;
 	}
 

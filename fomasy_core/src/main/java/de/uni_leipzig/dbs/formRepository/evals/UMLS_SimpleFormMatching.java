@@ -3,6 +3,7 @@ package de.uni_leipzig.dbs.formRepository.evals;
 import de.uni_leipzig.dbs.formRepository.importer.annotation.csv.AnnotationWriter;
 import de.uni_leipzig.dbs.formRepository.matching.preprocessing.exception.PreprocessingException;
 import de.uni_leipzig.dbs.formRepository.matching.preprocessing.extraction.POSBasedExtractingPreprocessor;
+import de.uni_leipzig.dbs.formRepository.operation.ExtractOperator;
 import it.unimi.dsi.fastutil.ints.Int2FloatMap;
 
 import java.io.IOException;
@@ -99,7 +100,7 @@ public class UMLS_SimpleFormMatching {
 					new PreprocessProperty("question","EN",null)};
 			config.addPreprocessingStepForProperties(PreprocessingSteps.TO_LOW, properties);
 			config.addPreprocessingStepForProperties(PreprocessingSteps.STOPWORD_EXTRACTION,properties);
-			//config.addPreprocessingStepForProperties(PreprocessingSteps.KEYWORD_EXTRACTION, new PreprocessProperty("question","EN",null));
+			//config.addPreprocessingStepForProperties(PreprocessingSteps.KEYWORD_EXTRACTION, properties);
 			//config.addPreprocessingStepForProperties(PreprocessingSteps.NORMALIZE,properties);
 			Set<String> formTypes = new HashSet<String>();
 			formTypes.add("eligibility form");
@@ -122,6 +123,7 @@ public class UMLS_SimpleFormMatching {
 					encodedStructures.add(encForm);
 					propsSrc = esv.getAvailableProperties("question","EN",null);
 					propsSrc.addAll(esv.getAvailableProperties("name", null, null));
+					System.out.println(propsSrc.toString());
 					size +=encForm.getObjIds().size();
 					//count number of documents where tokens occur
 					TFIDFTokenWeightGenerator.getInstance().initializeGlobalCount(encForm, propsSrc.toArray(new GenericProperty[]{}));
@@ -144,7 +146,9 @@ public class UMLS_SimpleFormMatching {
 					umls.removeEntity(id);
 				}
 			}
-			
+			Set<GenericProperty> propsTarget = umls.getAvailableProperties("name", "EN", null);
+			propsTarget.addAll(umls.getAvailableProperties("synonym", "EN",null));
+
 			PreprocessProperty[] propertiesUmls = new PreprocessProperty[]{new PreprocessProperty("name", "EN", null),
 					new PreprocessProperty("synonym","EN",null)};
 			PreprocessorConfig configUmls = new PreprocessorConfig();
@@ -153,10 +157,11 @@ public class UMLS_SimpleFormMatching {
 			configUmls.addPreprocessingStepForProperties(PreprocessingSteps.STOPWORD_EXTRACTION, propertiesUmls);
 			//configUmls.addPreprocessingStepForProperties(PreprocessingSteps.NORMALIZE, propertiesUmls);
 			umls = preExec.preprocess(umls, configUmls);
+			umls.deduplicateProperties(propsTarget);
+
 			EncodedEntityStructure eesTarget = EncodingManager.getInstance().encoding(umls, true);
 			size+=eesTarget.getObjIds().size();
-			Set<GenericProperty> propsTarget = umls.getAvailableProperties("name", "EN", null);
-			propsTarget.addAll(umls.getAvailableProperties("synonym", "EN",null));
+
 			
 			//TokenSimilarityLookup.getInstance().computeTrigramLookup(forms, umls, rep);
 			TFIDFTokenWeightGenerator.getInstance().initializeGlobalCount(eesTarget, propsTarget.toArray(new GenericProperty[]{}));
@@ -171,13 +176,31 @@ public class UMLS_SimpleFormMatching {
 			AnnotationMapping overallReferenceMapping = new AnnotationMapping();
 			for (EncodedEntityStructure ees:encodedStructures){
 				if (selForms.contains(ees.getStructureId())){
+
+					Set<GenericProperty> nameProperty = metaMap.get(ees.getStructureId()).getAvailableProperties("question","EN",null);
+					MatchOperator exact = new MatchOperator(RegisteredMatcher.EXACT_MATCHER, AggregationFunction.MAX, nameProperty,
+									propsTarget, 1f);
+					ExecutionTree treeExact = new ExecutionTree();
+					treeExact.addOperator(exact);
+					AnnotationMapping exactMapping;
+
+					exactMapping = mm.match(metaMap.get(ees.getStructureId()),ees,eesTarget,umls, treeExact, null);
+					for (EntityAnnotation ea: exactMapping.getAnnotations()){
+						System.out.println(ea);
+					}
+					System.out.println("exact:" +exactMapping.getNumberOfAnnotations());
+
+					EncodedEntityStructure restEes = ExtractOperator.extractUnannotatedEntities(ees,exactMapping);
+
+					//EncodedEntityStructure restEes = ees;
 					MatchOperator mop = new MatchOperator(RegisteredMatcher.LCS_MATCHER, AggregationFunction.MAX, propsSrc, propsTarget, 0.65f);
-					MatchOperator mop2 = new MatchOperator(RegisteredMatcher.TRIGRAM_MATCHER, AggregationFunction.MAX, propsSrc, propsTarget, 0.65f);
+					MatchOperator mop2 = new MatchOperator(RegisteredMatcher.TRIGRAM_MATCHER, AggregationFunction.MAX, propsSrc, propsTarget, 0.75f);
 					MatchOperator mop3 = new MatchOperator(RegisteredMatcher.TFIDF_MATCHER, AggregationFunction.MAX, propsSrc, propsTarget, 0.65f);
 					MatchGroup group = new MatchGroup();
+					group.addMatcher(mop3);
 					group.addMatcher(mop);
 					//group.addMatcher(mop2);
-					group.addMatcher(mop3);
+
 					SetOperator sop = new SetOperator(AggregationFunction.MAX, SetOperator.UNION);
 					group.setOperator(sop);
 					globalObjects.put(TFIDFMatcher.IDF_MAP_SOURCE, idfMap);
@@ -189,7 +212,8 @@ public class UMLS_SimpleFormMatching {
 					tree.addOperator(group);
 					//umls.clear();
 
-					AnnotationMapping am = mm.match(metaMap.get(ees.getStructureId()),ees, eesTarget,umls, tree, null);
+					AnnotationMapping am = mm.match(metaMap.get(restEes.getStructureId()),restEes, eesTarget,umls, tree, null);
+
 					Selection selection = new GroupSelection ();
 					List<String> annos = new ArrayList<>();
 					AnnotationWriter aw = new AnnotationWriter();
@@ -197,10 +221,14 @@ public class UMLS_SimpleFormMatching {
 						annos.add(ea.getTargetAccession());
 					}
 
-					System.out.println("before selection: "+am.getNumberOfAnnotations());
+					System.out.println(metaMap.get(ees.getStructureId()).getMetadata().getName()+
+									" before selection: "+am.getNumberOfAnnotations());
+					aw.writeAnnotation(metaMap.get(ees.getStructureId()),umls, am, propsSrc, propsTarget,
+									"mappings/"+metaMap.get(ees.getStructureId()).getMetadata().getName()+"_comb.csv");
 
-					am = selection.select(am, ees, eesTarget, propsSrc, propsTarget, 0.3f, 0,1f, rep);
-					
+					am = selection.select(am, restEes, eesTarget, propsSrc, propsTarget, 0.3f, 0,1f, rep);
+					am = SetAnnotationOperator.union(AggregationFunction.MAX, am, exactMapping);
+
 					VersionMetadata vm = metaMap.get(ees.getStructureId()).getMetadata();
 					String mappingName= vm.getName()+"["+vm.getTopic()+"]-"
 							+umls.getMetadata().getName()+"["+umls.getMetadata().getTopic()+"]_odm";
@@ -268,6 +296,8 @@ public class UMLS_SimpleFormMatching {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (PreprocessingException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}

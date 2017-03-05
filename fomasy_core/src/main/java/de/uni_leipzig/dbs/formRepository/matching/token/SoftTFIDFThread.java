@@ -1,12 +1,6 @@
 package de.uni_leipzig.dbs.formRepository.matching.token;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import de.uni_leipzig.dbs.formRepository.matching.blocking.data.BlockSet;
 import de.uni_leipzig.dbs.formRepository.matching.preprocessing.encoding.EncodingManager;
@@ -121,8 +115,6 @@ Logger log = Logger.getLogger(getClass());
 										sim = this.computeSimilarity(countMapSrc , countMapTarget);
 										//sim = this.computeSimilarity(srcTerms, targetTerms, srcId, te);
 										//sim = this.computeWeightedConfidence(countMapSrc, countMapTarget);
-
-
 										if (sim > 0) {
 											Set<Integer> pos = new HashSet<>();
 											positionMap.put(sim, pos);
@@ -220,6 +212,13 @@ Logger log = Logger.getLogger(getClass());
 		}
 
 		for (Integer i :onlyInSrc){
+				if (frequencySrc.get(i)==null){
+					System.out.println("error token");
+				}
+				if (idfSourceMap.get(i) ==null){
+					System.out.println("error token"+idfSourceMap.size());
+				}
+
 				float tfidfSrc = frequencySrc.get(i)/(float)frequencySrc.size()*idfSourceMap.get(i);
 				lengthSrc+= tfidfSrc*tfidfSrc;
 		}

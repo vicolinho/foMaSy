@@ -41,12 +41,30 @@ public class RDBMS_GraphAPI implements GraphAPI{
 	int overallEdges =0;
 	
 	private Map<String,Integer> edgeTypeCount;
-	public static final String RELS = "Select  target_id, r.rel_name, e.ent_type from entity_relationship er , rel_type r ,entity e "
+	public static final String INV_RELS = "Select  target_id, r.rel_name, e.ent_type from entity_relationship er , rel_type r ,entity e "
 			+ "where "
 			+"r.rel_type_id = er.rel_type_id_fk AND "
 			+ "r.rel_type_id not in (64,95,96,125,143,195) AND "
 			+ "e.ent_id = target_id AND "
 			+"er.src_id =? ";
+
+	public static final String RELS = "Select  src_id, r.rel_name, e.ent_type from entity_relationship er , rel_type r ,entity e "
+					+ "where "
+					+"r.rel_type_id = er.rel_type_id_fk AND "
+					+ "r.rel_type_id not in (64,95,96,125,143,195) AND "
+					+ "e.ent_id = src_id AND "
+					+"er.target_id =? ";
+
+	/**
+	 * The edge is represented by target_id-->src_id. This confusion is caused by the definition of UMLS that defines
+	 * relationships from CUI2 to CUI1 ('current concept')
+	 */
+	public static final String IS_A_PARENTS = "Select er.src_id, r.rel_name, e.ent_type from entity_relationship er , rel_type r ,entity e "
+					+ "where "
+					+"r.rel_type_id = er.rel_type_id_fk AND "
+					+ "r.rel_name ='isa' AND "
+					+ "e.ent_id = src_id AND "
+					+"er.target_id =?";
 
 	public DirectedGraph<Node, Edge> getSubgraphFromExternalStructure(
 			EntitySet<GenericEntity> nodes, VersionMetadata externalStructure,
@@ -157,16 +175,42 @@ public class RDBMS_GraphAPI implements GraphAPI{
 //				e.setWeight(e.getWeight()/maxRidf);
 //		}
 		return graph;
-		
 	}
-	
+
+	public DirectedGraph <Node,Edge> getIsAConcepts (EntitySet<GenericEntity> rootNodes,VersionMetadata structure,
+																													int depth)throws GraphAPIException{
+		nodeMap = new HashMap<>();
+		parentChildRelationship = new HashMap<>();
+		edgeTypeCount = new HashMap<>();
+		Connection con =null;
+		try {
+			con = DBConHandler.getInstance().getConnection();
+			this.breathFirstSearchIsA(con, rootNodes, depth);
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new GraphAPIException(e);
+		}finally {
+			try {
+				con.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
+		GraphBuilder builder = new GraphBuilder();
+		DirectedGraph<Node,Edge> graph = builder.generateGraphFromGraphData(nodeMap, parentChildRelationship);
+		return graph;
+	}
+
+
+
 	private void breathFirstSearch(Connection con, EntitySet<GenericEntity> nodeSet,
 			Map <String,List<GenericEntity>> valueEntityMapping,Set<GenericProperty> gp,int depth ) throws GraphAPIException{
 		try {
 			Set<Integer> alreadyVisit = new HashSet<Integer>();
 			PreparedStatement relStmt = con.prepareStatement(RELS);
 			for (GenericEntity ge : nodeSet){
-				
 				alreadyVisit.clear();
 				this.addEdgeToSourceNode(ge, valueEntityMapping, gp);
 				Node n = new NodeImpl(ge.getId());
@@ -252,7 +296,6 @@ public class RDBMS_GraphAPI implements GraphAPI{
 				while (!stack.isEmpty()){
 					int currentNode = stack.pop();
 					relStmt.setInt(1,currentNode);
-					
 					ResultSet rs = relStmt.executeQuery();
 					while (rs.next()){
 						int targetId = rs.getInt(1);
@@ -310,7 +353,61 @@ public class RDBMS_GraphAPI implements GraphAPI{
 			e1.printStackTrace();
 		}
 	}
-	
+
+	private void breathFirstSearchIsA (Connection con,EntitySet<GenericEntity> roots,int depth){
+		try {
+			Set<Integer> alreadyVisit = new HashSet<>();
+			PreparedStatement relStmt = con.prepareStatement(IS_A_PARENTS);
+			for (GenericEntity ge : roots){
+				alreadyVisit.clear();
+				Node n = new NodeImpl(ge.getId());
+				n.setDepth(0);
+				nodeMap.put(n.getId(), n);
+				Stack<Integer> stack = new Stack<>();
+				stack.add(ge.getId());
+				relStmt.setInt(1,ge.getId());
+				while (!stack.isEmpty()){
+					int currentNode = stack.pop();
+					relStmt.setInt(1,currentNode);
+					ResultSet rs = relStmt.executeQuery();
+					while (rs.next()){
+						int superClassId = rs.getInt(1);
+						String rel_type = rs.getString(2);
+						String ent_type = rs.getString(3);
+
+						if (!alreadyVisit.contains(superClassId)&&
+										(nodeMap.get(currentNode).getDepth()+1)<=depth){
+							stack.add(superClassId);
+							alreadyVisit.add(superClassId);
+							Node superNode = new NodeImpl(superClassId);
+							nodeMap.put(superNode.getId(), superNode);
+							superNode.setDepth(nodeMap.get(currentNode).getDepth()+1);
+						}
+						if (alreadyVisit.contains(superClassId)){
+							Edge  e  = new EdgeImpl(currentNode, superClassId, rel_type);
+							Map <Integer,List<Edge>> edgesPerType = parentChildRelationship.get(rel_type);
+							if (edgesPerType ==null){
+								edgesPerType = new HashMap<Integer,List<Edge>>();
+								parentChildRelationship.put(rel_type, edgesPerType);
+							}
+							List<Edge> children = edgesPerType.get(currentNode);
+							if (children ==null){
+								children = new ArrayList<Edge>();
+								edgesPerType.put(currentNode, children);
+							}
+							children.add(e);
+						}
+					}
+					rs.close();
+				}//stack is not empty
+			}
+			relStmt.close();
+		} catch (SQLException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+	}
+
 	private void addEdgeToSourceNode(GenericEntity target,Map <String,List<GenericEntity>> valueEntityMapping,Set<GenericProperty> gp){
 		for (GenericProperty p:gp){
 			List<String> values = target.getPropertyValues(p);

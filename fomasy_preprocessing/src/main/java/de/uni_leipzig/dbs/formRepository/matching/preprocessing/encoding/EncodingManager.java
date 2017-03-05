@@ -121,6 +121,39 @@ public class EncodingManager {
 		ees.setTrigramIds(trigramIds);
 		return ees;
 	}
+
+	public EncodedEntityStructure encoding(EntitySet<GenericEntity> esv , Set<String> types){
+		int entityIndex = 0;
+		//int[] objIds = new int[esv.getNumberOfEntities()];
+		Map<Integer,String> typeMap = new HashMap<> ();
+		EncodedEntityStructure ees = new EncodedEntityStructure(-1);
+		Int2IntMap objIds = new Int2IntOpenHashMap();
+		Map<GenericProperty ,Integer> propertyPosition = this.encodeProperties(esv);
+		int count = 0;
+		for (GenericEntity ge: esv){
+			if (types.contains(ge.getType())){
+				count++;
+			}
+		}
+
+		int [][][][] propertyValueIds = new int[count][][][];
+		int [][][][] trigramIds = new int[count][][][];
+		for (GenericEntity ge : esv) {
+			if (types.contains(ge.getType())) {
+				typeMap.put(ge.getId(), ge.getType());
+				objIds.put(ge.getId(), entityIndex);
+				propertyValueIds = this.encodePropertyValues(propertyValueIds, entityIndex, ge, propertyPosition);
+				trigramIds = this.encodeTrigrams(trigramIds, entityIndex, ge, propertyPosition);
+				entityIndex++;
+			}
+		}
+		ees.setTypeMap(typeMap);
+		ees.setObjIds(objIds);
+		ees.setPropertyPosition(propertyPosition);
+		ees.setPropertyValueIds(propertyValueIds);
+		ees.setTrigramIds(trigramIds);
+		return ees;
+	}
 	
 	
 
@@ -169,12 +202,12 @@ public class EncodingManager {
 		int[][][] propertyValues = new int[propertyMap.size()][][];
 		propertyValueIds[entityIndex] = propertyValues;
 		for (Entry<GenericProperty,Integer> e: propertyMap.entrySet()){
-			StringPropertyValueSet propertyValueSet = ge.getValues(e.getKey());
+			List<PropertyValue> propertyValueSet = ge.getValues(e.getKey());
 			int propPos = e.getValue();
-			Collection <PropertyValue> set = propertyValueSet.getCollection();
+			Collection <PropertyValue> set = propertyValueSet;
 			propertyValues[propPos] = new int[set.size()][];
 			int pvIndex =0;
-			for (PropertyValue pv: propertyValueSet.getCollection()){
+			for (PropertyValue pv: propertyValueSet){
 				String [] tokens = this.getTokens(pv.getValue().trim());
 				propertyValues[propPos][pvIndex] = new int[tokens.length];
 				int tIndex =0;
@@ -197,12 +230,12 @@ public class EncodingManager {
 		int[][][] propertyValues = new int[propertyMap.size()][][];
 		trigramIds[entityIndex] = propertyValues;
 		for (Entry<GenericProperty,Integer> e: propertyMap.entrySet()){
-			StringPropertyValueSet propertyValueSet = ge.getValues(e.getKey());
+			List<PropertyValue> propertyValueSet = ge.getValues(e.getKey());
 			int propPos = e.getValue();
-			Collection <PropertyValue> set = propertyValueSet.getCollection();
+			Collection <PropertyValue> set = propertyValueSet;
 			propertyValues[propPos] = new int[set.size()][];
 			int pvIndex =0;
-			for (PropertyValue pv: propertyValueSet.getCollection()){
+			for (PropertyValue pv: propertyValueSet){
 				String t = pv.getValue().trim();
 				IntList triIds = new IntArrayList();
 				if (!t.isEmpty()) {

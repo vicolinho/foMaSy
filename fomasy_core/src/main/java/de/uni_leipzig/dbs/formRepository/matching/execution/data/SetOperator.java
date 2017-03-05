@@ -56,9 +56,9 @@ public class SetOperator extends Operator{
 		for (long cor: resultingSet){
 			for (Long2FloatMap mapping : mappings){
 				Float sim = mapping.get(cor);
-				if (sim!=null){
+				if (sim!=mapping.defaultReturnValue()){
 					Float aggSim = combinedMap.get(cor);
-					if (aggSim==null){
+					if (aggSim==combinedMap.defaultReturnValue()){
 						combinedMap.put(cor,sim.floatValue());
 						if (aggFunction == AggregationFunction.AVG){
 							occMap.put(cor, 1);

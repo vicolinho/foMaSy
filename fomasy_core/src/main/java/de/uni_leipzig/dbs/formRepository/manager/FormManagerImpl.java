@@ -20,7 +20,7 @@ import de.uni_leipzig.dbs.formRepository.importer.EntityStructureImporter;
 
 public class FormManagerImpl implements FormManager {
 
-	public void importForm(String file) throws FileNotFoundException, IOException, InstantiationException, IllegalAccessException, ClassNotFoundException, ImportException {
+	public void importForm(String file) throws IOException, InstantiationException, IllegalAccessException, ClassNotFoundException, ImportException {
 		EntityStructureImporter fm = new EntityStructureImporter();
 		fm.importForm(file);
 
@@ -44,6 +44,13 @@ public class FormManagerImpl implements FormManager {
 		return APIFactory.getInstance().
 				getStructureAPI().getEntityStructureVersion(name, type, version);
 		
+	}
+
+	public EntityStructureVersion getStructureVersion(String name, String type, String version,
+			Set<GenericProperty> usedProps) throws VersionNotExistsException, StructureBuildException {
+		return APIFactory.getInstance().
+						getStructureAPI().getEntityStructureVersion(name, type, version, usedProps);
+
 	}
 
 	public EntityStructureVersion getLatestStructureVersion(String name,
@@ -74,6 +81,11 @@ public class FormManagerImpl implements FormManager {
 	public EntitySet<GenericEntity> getEntitiesByPropertyWithProperties(Set<String> values, VersionMetadata vm,Set<GenericProperty> gps) throws EntityAPIException {
 		// TODO Auto-generated method stub
 		return APIFactory.getInstance().getEntityAPI().getEntityWithPropertiesByProperty(values, vm, gps);
+	}
+
+	@Override
+	public Map<String, Integer> getIdMapping(String name, String date, String type) {
+		return  APIFactory.getInstance().getStructureAPI().getIdMapping(name, date, type);
 	}
 
 	public VersionMetadata getMetadata(String name, String type, String version)

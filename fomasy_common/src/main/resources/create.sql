@@ -72,7 +72,7 @@ Create table if not exists termgroup_annotation (
 
 create table if not exists rel_type (
 rel_type_id int auto_increment ,
-rel_name varchar (50),
+rel_name varchar (150),
 is_directed boolean default true,
  primary key (rel_type_id)
 );

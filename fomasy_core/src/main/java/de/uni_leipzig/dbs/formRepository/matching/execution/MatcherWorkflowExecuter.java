@@ -179,7 +179,7 @@ public class MatcherWorkflowExecuter {
 	
 	private Long2FloatMap matcherExecution(MatchOperator mop, EncodedEntityStructure source,
 			EncodedEntityStructure target, Pruning pruning) throws ClassNotFoundException, UnknownMatcherException, MatchingExecutionException{
-		Long2FloatMap result = new Long2FloatOpenHashMap() ;
+		Long2FloatMap result;
 		Matcher m = MatcherFactory.getInstance().getRegisteredMatcher(mop.getMachterName(),
 				source.getPropertyPosition(), target.getPropertyPosition(), mop.getSrcProps(), mop.getTargetProps());
 		

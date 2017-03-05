@@ -4,11 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import de.uni_leipzig.dbs.formRepository.dataModel.EntitySet;
-import de.uni_leipzig.dbs.formRepository.dataModel.EntityStructureVersion;
-import de.uni_leipzig.dbs.formRepository.dataModel.GenericEntity;
-import de.uni_leipzig.dbs.formRepository.dataModel.PropertyValue;
-import de.uni_leipzig.dbs.formRepository.dataModel.StringPropertyValueSet;
+import de.uni_leipzig.dbs.formRepository.dataModel.*;
 import de.uni_leipzig.dbs.formRepository.matching.preprocessing.PreprocessProperty;
 import de.uni_leipzig.dbs.formRepository.matching.preprocessing.Preprocessor;
 import edu.stanford.nlp.ling.HasWord;
@@ -37,26 +33,30 @@ public class POSBasedExtractingPreprocessor implements Preprocessor {
 			    	lp = LexicalizedParser.loadModel(grammar, options);
 			    for (GenericEntity ge: esv.getEntities()){
 			    	for (PreprocessProperty pp: propList){
-			    		StringPropertyValueSet values = ge.getPropertyValueSet(pp.getName(), pp.getLang(),pp.getScope());
-						for (PropertyValue pv: values.getCollection()){
-							String value = pv.getValue();
-							List<?extends HasWord> list = lp.tokenize(value);
-							Tree tree = lp.parse(list);
+							Set<GenericProperty> gps = ge.getGenericProperties(pp.getName(), pp.getLang(),pp.getScope());
+							for (GenericProperty gp : gps) {
 
-							for (TaggedWord tw:tree.taggedYield()){
-								if (filterTags.contains(tw.tag())){
-									sb.append(tw.value()+" ");
+								List<PropertyValue> values = ge.getValues(gp);
+								for (PropertyValue pv : values) {
+									String value = pv.getValue();
+									List<? extends HasWord> list = lp.tokenize(value);
+									Tree tree = lp.parse(list);
+
+									for (TaggedWord tw : tree.taggedYield()) {
+										if (filterTags.contains(tw.tag())) {
+											sb.append(tw.value() + " ");
+										}
+									}
+
+									if (sb.length() > 0) {
+										String newValue = sb.toString().trim();
+										newValue = newValue.replaceAll("\\s+", " ");
+										pv.setValue(newValue);
+										sb.delete(0, sb.length() - 1);
+									}
 								}
+								ge.changePropertyValues(gp, values);
 							}
-
-							if (sb.length()>0) {
-								String newValue = sb.toString().trim();
-								newValue = newValue.replaceAll("\\s+", " ");
-								pv.setValue(newValue);
-								sb.delete(0, sb.length() - 1);
-							}
-						}
-						ge.changePropertyValues(values);
 			    	}
 			    }
 			    return esv;
@@ -74,21 +74,30 @@ public class POSBasedExtractingPreprocessor implements Preprocessor {
 	    	lp = LexicalizedParser.loadModel(grammar, options);
 	    for (GenericEntity ge: esv){
 	    	for (PreprocessProperty pp: propList){
-	    		StringPropertyValueSet values = ge.getPropertyValueSet(pp.getName(), pp.getLang(),pp.getScope());
-				for (PropertyValue pv: values.getCollection()){
-					String value = pv.getValue();
-					List<?extends HasWord> list = lp.tokenize(value);
-					Tree tree = lp.parse(list);
-					for (TaggedWord tw:tree.taggedYield()){
-						if (filterTags.contains(tw.tag())){
-							sb.append(tw.value()+" ");
+					Set<GenericProperty> gps = ge.getGenericProperties(pp.getName(), pp.getLang(),pp.getScope());
+					for (GenericProperty gp : gps) {
+
+						List<PropertyValue> values = ge.getValues(gp);
+						for (PropertyValue pv : values) {
+							String value = pv.getValue();
+							List<? extends HasWord> list = lp.tokenize(value);
+							Tree tree = lp.parse(list);
+
+							for (TaggedWord tw : tree.taggedYield()) {
+								if (filterTags.contains(tw.tag())) {
+									sb.append(tw.value() + " ");
+								}
+							}
+
+							if (sb.length() > 0) {
+								String newValue = sb.toString().trim();
+								newValue = newValue.replaceAll("\\s+", " ");
+								pv.setValue(newValue);
+								sb.delete(0, sb.length() - 1);
+							}
 						}
+						ge.changePropertyValues(gp, values);
 					}
-					String newValue = sb.toString().trim();
-					pv.setValue(newValue);
-					sb.delete(0,sb.length()-1);
-				}
-				ge.changePropertyValues(values);
 	    	}
 	    }
 		return esv;
