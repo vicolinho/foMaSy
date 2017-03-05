@@ -212,13 +212,6 @@ Logger log = Logger.getLogger(getClass());
 		}
 
 		for (Integer i :onlyInSrc){
-				if (frequencySrc.get(i)==null){
-					System.out.println("error token");
-				}
-				if (idfSourceMap.get(i) ==null){
-					System.out.println("error token"+idfSourceMap.size());
-				}
-
 				float tfidfSrc = frequencySrc.get(i)/(float)frequencySrc.size()*idfSourceMap.get(i);
 				lengthSrc+= tfidfSrc*tfidfSrc;
 		}

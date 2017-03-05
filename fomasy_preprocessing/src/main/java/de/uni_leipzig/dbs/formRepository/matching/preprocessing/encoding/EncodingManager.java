@@ -50,6 +50,7 @@ public class EncodingManager {
 	public static final int NUMBER_OF_UNIGRAMS = 128*128*128;
 	public static final int ALPHABET_SIZE = 128;
 	int tokenId ;
+	int setId;
 	private HashMap<String,Integer> dictionary;
 	
 
@@ -61,6 +62,7 @@ public class EncodingManager {
 		dictionary = new HashMap<String,Integer>();
 		setReverseDict(new HashMap<Integer,String>());
 		tokenId=0;
+		setId=-1;
 	}
 	
 	
@@ -101,7 +103,7 @@ public class EncodingManager {
 		int entityIndex = 0;
 		//int[] objIds = new int[esv.getNumberOfEntities()];
 		Map<Integer,String> typeMap = new HashMap<> ();
-		EncodedEntityStructure ees = new EncodedEntityStructure(-1);
+		EncodedEntityStructure ees = new EncodedEntityStructure(setId--);
 		Int2IntMap objIds = new Int2IntOpenHashMap();
 		Map<GenericProperty ,Integer> propertyPosition = this.encodeProperties(esv);
 		
@@ -122,11 +124,12 @@ public class EncodingManager {
 		return ees;
 	}
 
+
 	public EncodedEntityStructure encoding(EntitySet<GenericEntity> esv , Set<String> types){
 		int entityIndex = 0;
 		//int[] objIds = new int[esv.getNumberOfEntities()];
 		Map<Integer,String> typeMap = new HashMap<> ();
-		EncodedEntityStructure ees = new EncodedEntityStructure(-1);
+		EncodedEntityStructure ees = new EncodedEntityStructure(setId--);
 		Int2IntMap objIds = new Int2IntOpenHashMap();
 		Map<GenericProperty ,Integer> propertyPosition = this.encodeProperties(esv);
 		int count = 0;
