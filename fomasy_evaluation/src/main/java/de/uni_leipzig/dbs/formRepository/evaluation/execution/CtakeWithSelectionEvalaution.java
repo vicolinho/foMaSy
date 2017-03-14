@@ -34,7 +34,7 @@ public class CtakeWithSelectionEvalaution {
 
   public static final String PATH = "ctakes-clinical-pipeline/desc/analysis_engine";
 
-  public static final boolean IS_TOP2 = true;
+  public static final boolean IS_TOP2 = false;
 
   public static final float THRESHOLD = 0.3f;
 
