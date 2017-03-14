@@ -8,16 +8,19 @@ import de.uni_leipzig.dbs.formRepository.dataModel.EntityStructureVersion;
 import de.uni_leipzig.dbs.formRepository.dataModel.GenericProperty;
 import de.uni_leipzig.dbs.formRepository.dataModel.VersionMetadata;
 import de.uni_leipzig.dbs.formRepository.evals.calculation.EvaluationResult;
+import de.uni_leipzig.dbs.formRepository.evals.calculation.HierarchicalMappingEvaluation;
 import de.uni_leipzig.dbs.formRepository.evals.calculation.MappingEvaluation;
 import de.uni_leipzig.dbs.formRepository.evaluation.exception.AnnotationException;
 import de.uni_leipzig.dbs.formRepository.evaluation.tool.combine.CTakeCombSelection;
 import de.uni_leipzig.dbs.formRepository.evaluation.tool.wrapper.AnnotationWrapper;
 import de.uni_leipzig.dbs.formRepository.evaluation.tool.wrapper.CTakeWrapper;
+import de.uni_leipzig.dbs.formRepository.exception.GraphAPIException;
 import de.uni_leipzig.dbs.formRepository.exception.StructureBuildException;
 import de.uni_leipzig.dbs.formRepository.exception.VersionNotExistsException;
 import de.uni_leipzig.dbs.formRepository.matching.aggregation.AggregationFunction;
 import de.uni_leipzig.dbs.formRepository.matching.selection.GroupSelection;
 import de.uni_leipzig.dbs.formRepository.operation.SetAnnotationOperator;
+import org.apache.log4j.PropertyConfigurator;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.util.InvalidXMLException;
 
@@ -27,9 +30,13 @@ import java.util.*;
 /**
  * Created by christen on 03.03.2017.
  */
-public class CtakeWithSelection {
+public class CtakeWithSelectionEvalaution {
 
   public static final String PATH = "ctakes-clinical-pipeline/desc/analysis_engine";
+
+  public static final boolean IS_TOP2 = true;
+
+  public static final float THRESHOLD = 0.3f;
 
   public static final String[] trials = new String[]{
           "NCT00168051","NCT00355849","NCT00175903","NCT00356109","NCT00357227",
@@ -41,8 +48,8 @@ public class CtakeWithSelection {
 
   public static final String[] AE_DESCRIPTIONS = new String[]{
           "AggregatePlaintextFastUMLSProcessor_VOL.xml",
-          //"AggregatePlaintextFastUMLSProcessor_V--.xml",
-          //"AggregatePlaintextFastUMLSProcessor_V-L.xml"
+          "AggregatePlaintextFastUMLSProcessor_V--.xml",
+          "AggregatePlaintextFastUMLSProcessor_V-L.xml"
         };
 
   public static final GenericProperty[] umlsProperties = new GenericProperty[]{
@@ -56,6 +63,7 @@ public class CtakeWithSelection {
 
   public static void main (String[] args){
 
+    PropertyConfigurator.configure("log4j.properties");
     String date = "2014-01-01";
     String name = "umls2014AB";
     String type = "ontology";
@@ -108,19 +116,27 @@ public class CtakeWithSelection {
         AnnotationMapping overallMapping = new AnnotationMapping();
         for (EntityStructureVersion es : esvSet) {
           if (usedTrials.contains(es.getMetadata().getName())) {
-            Set<GenericProperty> gps = esvSet.iterator().next().getAvailableProperties("question", "EN", null);
+            Set<GenericProperty> gps = es.getAvailableProperties("question", "EN", null);
             gps.addAll(esvSet.iterator().next().getAvailableProperties("name", null, null));
             prop.put(CTakeWrapper.PROPERTIES, gps);
             AnnotationMapping am = wrapper.computeMapping(es, prop);
-            am = selection.selectAnnoation(rep, am, new GroupSelection(), gps, usedProperties);
+            am = selection.selectAnnoation(rep, am, new GroupSelection(), gps, usedProperties, THRESHOLD);
             overallMapping = SetAnnotationOperator.union(AggregationFunction.MAX, overallMapping, am);
           }
         }
         long end = System.currentTimeMillis();
         System.out.println(end - start);
-        MappingEvaluation me = new MappingEvaluation();
-        EvaluationResult er = me.getResult(overallMapping, referenceMapping, "eligibility criteria", "umls");
-        results.add(er.toStringArray());
+        if (!IS_TOP2){
+          MappingEvaluation me = new MappingEvaluation();
+          EvaluationResult er = me.getResult(overallMapping, referenceMapping, "eligibility criteria", "umls");
+          results.add(er.toStringArray());
+        }else{
+          HierarchicalMappingEvaluation me = new HierarchicalMappingEvaluation();
+          VersionMetadata all = new VersionMetadata(-1, new Date(), new Date(), "all_forms", "eligibility criteria");
+          EvaluationResult er = me.getResult(overallMapping, referenceMapping, all, umlsMeta, rep);
+          results.add(er.toStringArray());
+        }
+
       }
 
       String resTable = writeTable(AE_DESCRIPTIONS, results);
@@ -145,6 +161,8 @@ public class CtakeWithSelection {
     } catch (IOException e) {
       e.printStackTrace();
     } catch (ResourceInitializationException e) {
+      e.printStackTrace();
+    } catch (GraphAPIException e) {
       e.printStackTrace();
     }
   }

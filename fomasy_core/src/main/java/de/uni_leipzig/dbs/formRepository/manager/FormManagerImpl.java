@@ -47,9 +47,11 @@ public class FormManagerImpl implements FormManager {
 	}
 
 	public EntityStructureVersion getStructureVersion(String name, String type, String version,
-			Set<GenericProperty> usedProps) throws VersionNotExistsException, StructureBuildException {
+			Set<GenericProperty> usedProps, Set<GenericProperty> optionalProperties)
+					throws VersionNotExistsException, StructureBuildException {
 		return APIFactory.getInstance().
-						getStructureAPI().getEntityStructureVersion(name, type, version, usedProps);
+						getStructureAPI().getEntityStructureVersion(name, type,
+						version, usedProps, optionalProperties);
 
 	}
 

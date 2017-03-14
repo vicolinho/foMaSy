@@ -41,7 +41,8 @@ public interface FormManager {
 					throws VersionNotExistsException, StructureBuildException;
 
 	EntityStructureVersion getStructureVersion(String name, String type, String version,
-																						 Set<GenericProperty> usedProps) throws VersionNotExistsException, StructureBuildException;
+		 Set<GenericProperty> usedProps, Set<GenericProperty> optionalProperties)
+					throws VersionNotExistsException, StructureBuildException;
 	/**
 	 * 
 	 * @param name of the entity structure

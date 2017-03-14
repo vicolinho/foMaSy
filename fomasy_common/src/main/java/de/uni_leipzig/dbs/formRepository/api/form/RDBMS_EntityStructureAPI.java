@@ -136,7 +136,7 @@ public class RDBMS_EntityStructureAPI implements EntityStructureAPI {
 
 	@Override
 	public EntityStructureVersion getEntityStructureVersion(String name, String type,
-			String date, Set<GenericProperty> usedProps) throws VersionNotExistsException, StructureBuildException {
+			String date, Set<GenericProperty> usedProps, Set<GenericProperty> optionalProperties) throws VersionNotExistsException, StructureBuildException {
 		Connection con = null;PreparedStatement pstmt =null;
 		try {
 			con = DBConHandler.getInstance().getConnection();
@@ -166,7 +166,7 @@ public class RDBMS_EntityStructureAPI implements EntityStructureAPI {
 			}
 			log.debug("retrieve entities:"+ entities.size());
 			structure = this.addRelationships(con,structure, structId, from, to);
-			structure = this.addProperties(con, structure, structId, usedProps, from, to);
+			structure = this.addProperties(con, structure, structId, usedProps,optionalProperties, from, to);
 			log.debug("load property values");
 			//structure = this.addAvailableProperties(con, structure, structId, from, to);
 			pstmt.close();
@@ -304,8 +304,8 @@ public class RDBMS_EntityStructureAPI implements EntityStructureAPI {
 		return esv;
 	}
 
-	private EntityStructureVersion addProperties (Connection con, EntityStructureVersion esv, int struct_id,
-						Set<GenericProperty> props, String from, String to) throws StructureBuildException{
+	private EntityStructureVersion addProperties (Connection con, EntityStructureVersion esv,
+			int struct_id, Set<GenericProperty> props, Set<GenericProperty> optProps,String from, String to) throws StructureBuildException{
 		try {
 			PreparedStatement pstmt = con.prepareStatement(GET_PROPERTIES);
 			pstmt.setInt(1, struct_id);
@@ -313,6 +313,7 @@ public class RDBMS_EntityStructureAPI implements EntityStructureAPI {
 			pstmt.setString(3, to);
 			ResultSet rs = pstmt.executeQuery();
 			IntSet avProperties = new IntOpenHashSet();
+			IntSet entities = new IntOpenHashSet();
 			while (rs.next()){
 				int propId = rs.getInt(1);
 				String propName = rs.getString(2);
@@ -320,9 +321,20 @@ public class RDBMS_EntityStructureAPI implements EntityStructureAPI {
 				String scope = rs.getString(4);
 				int pvid= rs.getInt(6);
 				String propValue = rs.getString(7);
+
 				if (!propValue.isEmpty()){
 					GenericProperty property = new GenericProperty(propId,propName, scope, lang);
 					if (this.isPropertyUsed(props, property)) {
+						PropertyValue pv = new PropertyValue(pvid, propValue);
+						GenericEntity ent = esv.getEntity(rs.getInt(5));
+						ent.addPropertyValue(property, pv);
+						entities.add(ent.getId());
+						if (!avProperties.contains(propId)) {
+							avProperties.add(propId);
+							esv.addAvailableProperty(property);
+						}
+					}
+					if (this.isPropertyUsed(optProps, property)){
 						PropertyValue pv = new PropertyValue(pvid, propValue);
 						GenericEntity ent = esv.getEntity(rs.getInt(5));
 						ent.addPropertyValue(property, pv);
@@ -336,7 +348,7 @@ public class RDBMS_EntityStructureAPI implements EntityStructureAPI {
 			rs.close();
 			pstmt.close();
 			for (GenericEntity ge: esv.getEntities()){
-				if (ge.getProperties().isEmpty()){
+				if (!entities.contains(ge.getId())){
 					esv.removeEntity(ge.getId());
 				}
 			}

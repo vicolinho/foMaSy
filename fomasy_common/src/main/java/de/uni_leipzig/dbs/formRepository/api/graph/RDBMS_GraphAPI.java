@@ -56,15 +56,17 @@ public class RDBMS_GraphAPI implements GraphAPI{
 					+"er.target_id =? ";
 
 	/**
-	 * The edge is represented by target_id-->src_id. This confusion is caused by the definition of UMLS that defines
+	 * The edge is represented by target_id(child)-->src_id(parent). This confusion is caused by the definition of UMLS that defines
 	 * relationships from CUI2 to CUI1 ('current concept')
+	 * THIS corrected for new version is src_id(child)->target_id (parent)
 	 */
-	public static final String IS_A_PARENTS = "Select er.src_id, r.rel_name, e.ent_type from entity_relationship er , rel_type r ,entity e "
+	public static final String IS_A_PARENTS = "Select er.target_id, r.rel_name, e.ent_type from entity_relationship er , rel_type r ,entity e "
 					+ "where "
 					+"r.rel_type_id = er.rel_type_id_fk AND "
 					+ "r.rel_name ='isa' AND "
 					+ "e.ent_id = src_id AND "
-					+"er.target_id =?";
+					+"er.src_id =?";
+
 
 	public DirectedGraph<Node, Edge> getSubgraphFromExternalStructure(
 			EntitySet<GenericEntity> nodes, VersionMetadata externalStructure,

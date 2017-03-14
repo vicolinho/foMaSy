@@ -34,7 +34,8 @@ public interface EntityStructureAPI {
 	 * @throws StructureBuildException
 	 */
 	EntityStructureVersion getEntityStructureVersion(String name, String type, String date,
-																									 Set<GenericProperty> usedProperties) throws VersionNotExistsException, StructureBuildException;
+ 			Set<GenericProperty> usedProperties,Set<GenericProperty> optionalProperties)
+					throws VersionNotExistsException, StructureBuildException;
 
 	/**
 	 * get Entity Structure Version

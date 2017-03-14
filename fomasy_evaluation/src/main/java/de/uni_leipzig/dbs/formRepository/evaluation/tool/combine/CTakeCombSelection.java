@@ -18,6 +18,7 @@ import de.uni_leipzig.dbs.formRepository.matching.selection.GroupSelection;
 import de.uni_leipzig.dbs.formRepository.matching.token.SoftTFIDFMatcher;
 import de.uni_leipzig.dbs.formRepository.matching.token.TFIDFWindowMatcher;
 import it.unimi.dsi.fastutil.ints.Int2FloatMap;
+import org.apache.log4j.Logger;
 
 import javax.print.attribute.HashPrintJobAttributeSet;
 import java.util.HashMap;
@@ -25,33 +26,43 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+
 /**
  * Created by christen on 02.03.2017.
  */
 public class CTakeCombSelection {
 
-
-  private float threshold =0.5f;
+Logger log = Logger.getLogger(getClass());
+  private float threshold =0.3f;
   private EncodedEntityStructure eesSrc;
   private EncodedEntityStructure eesTarget;
 
   public AnnotationMapping selectAnnoation(FormRepository rep, AnnotationMapping am,
-                                           GroupSelection sel, Set<GenericProperty> srcProps, Set<GenericProperty> targetProps){
+    GroupSelection sel, Set<GenericProperty> srcProps, Set<GenericProperty> targetProps, float threshold){
     Set<Integer> questions = this.getIds(am, true);
     Set<Integer> concepts = this.getIds(am, false);
+    this.threshold = threshold;
     try {
       EntitySet<GenericEntity> srcGe =
         rep.getFormManager().getEntitiesByIdWithProperties(questions);
       EntitySet<GenericEntity> targetGe =
         rep.getFormManager().getEntitiesByIdWithProperties(concepts);
       EncodedAnnotationMapping eam = this.getSimilarities(srcGe, targetGe, srcProps, targetProps, rep);
+      int count =0;
+
       for (EntityAnnotation ea : am.getAnnotations()){
         EntityAnnotation ean = eam.getAnnotation(ea.getId());
         if (ean != null){
           ea.setSim(ean.getSim());
+        }else{
+          count++;
         }
       }
-      sel.select(am, eesSrc, eesTarget, srcProps, targetProps, 0.3f, 0f, 2, rep);
+      log.info("not sim:"+ count+" of " +am.getNumberOfAnnotations());
+      log.info(eam.getEvidenceMap().size());
+      am.setEvidenceMap(eam.getEvidenceMap());
+
+      am = sel.select(am, eesSrc, eesTarget, srcProps, targetProps, 0.3f, 0f, 2, rep);
     } catch (EntityAPIException e) {
       e.printStackTrace();
     } catch (MatchingExecutionException e) {
@@ -89,8 +100,7 @@ public class CTakeCombSelection {
     Set<String> itemTypes = new HashSet<>();
     itemTypes.add("item");
     eesSrc = EncodingManager.getInstance().encoding(src, itemTypes);
-    //System.out.println(eesTarget.getPropertyPosition().toString());
-    //System.out.println(targetProps.toString());
+
     Set<PreprocessProperty> preprocessProperties = new HashSet<>();
     for (GenericProperty gp : targetProps){
       preprocessProperties.add(new PreprocessProperty(gp.getName(),gp.getLanguage(), gp.getScope()));
@@ -109,7 +119,6 @@ public class CTakeCombSelection {
             +eesSrc.getObjIds().size());
 
     TokenSimilarityLookup.getInstance().computeTrigramLookup(src, target, srcProps, targetProps, rep);
-
     MatchOperator mop = new MatchOperator (RegisteredMatcher.SOFT_TFIDF_WND_MATCHER, AggregationFunction.MAX,
             srcProps, targetProps, threshold);
     Map<String,Object> externalMap = new HashMap<String,Object>();

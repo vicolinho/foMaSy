@@ -148,11 +148,15 @@ public class GroupSelection implements Selection{
 				isCommonToken = corSet.getEvidenceMap()!=null;
 				if (isCommonToken){
 					isCommonToken = !corSet.getEvidenceMap().isEmpty();
+
 				}
-				if (isCommonToken)
+				if (isCommonToken) {
 					umlsGroups = GroupFunctions.groupSimilarUMLSConsByCommonToken(umlsCons, e.getKey(), corSet);
-				else
-					umlsGroups = GroupFunctions.groupSimilarUMLSConsByConnectedComponent(umlsCons, preRanAtts, umls.getObjIds().size(), gi,t);
+					log.info("using token overlap");
+				}else {
+					umlsGroups = GroupFunctions.groupSimilarUMLSConsByConnectedComponent(umlsCons, preRanAtts, umls.getObjIds().size(), gi, t);
+					log.info("using new sims");
+				}
 				Set <Long> keptAnnotations = new HashSet<Long>();
 				for (Entry<Integer, Set<Integer>> e2: umlsGroups.entrySet()){
 					Set<Integer> umlsGroup = e2.getValue();

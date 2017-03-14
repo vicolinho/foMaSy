@@ -54,9 +54,41 @@ public class UMLS_SimpleFormMatching {
 	static String[] generalConcepts = new String[]{"Qualitative Concept","Quantitative Concept",
 		"Functional Concept","Temporal Concept","Conceptual Entity"};
 
+	public static final GenericProperty[] umlsProperties = new GenericProperty[]{
+					new GenericProperty(0, "name", "PN", "EN"),
+					new GenericProperty(1, "synonym", "PT", "EN"),
+					new GenericProperty(2, "synonym", "SY", "EN"),
+					new GenericProperty(3, "synonym", "SCN", "EN"),
+					new GenericProperty(4, "synonym", "FN", "EN"),
+					new GenericProperty(5, "synonym", "MH", "EN")
+	};
+
+	public static final GenericProperty[] optionalProperties = new GenericProperty[]{
+					new GenericProperty(6, "sem_type", null, null)
+	};
+
 	static final String[] tags = new String[]{"CD","FW","JJ","JJR","JJS","LS","NN","NNS","NNP","RB","RBS","SYM","IN"};
-	
-	
+
+	public static final String[] trials = new String[]{
+					"NCT00168051","NCT00355849","NCT00175903","NCT00356109","NCT00357227",
+					"NCT00359762","NCT00372229","NCT00190047","NCT00373373","NCT00195507",
+					"NCT00376337","NCT00384046","NCT00385372","NCT00391287","NCT00391872",
+					"NCT00393692","NCT00006045","NCT00048295","NCT00151112","NCT00153062",
+					"NCT00156338","NCT00157157","NCT00160524","NCT00160706","NCT00165828"
+	};
+
+	/*
+		int[] selectedForms = new int[]{2,3,8,9,10,
+						11,12,13,14,15,
+						16,20,21,76,77,
+						78,79,80,81,82,
+						83,84,85,86,87};
+		*/
+
+
+	//	int[] selectedForms = new int[]{461,455,456,457,458,459,464,466,
+	//		467,468,465,463,462,452,453,454,469,470,460,473,475,476,439,440};
+
 	public static void main (String args[]){
 		FormRepository rep = new FormRepositoryImpl();
 		PropertyConfigurator.configure("log4j.properties");
@@ -64,35 +96,27 @@ public class UMLS_SimpleFormMatching {
 		String name="umls2014AB";
 		String type ="ontology";
 		
-		String formName = "NCT00556270";
-		String dateForm = "2012-05-25";
-		String formType ="eligibility form";
+
 		
 		Set<String> semTypes = new HashSet<String> ();
 		for (String sem: generalConcepts){
 			semTypes.add(sem);
 		}
-	  int[] selectedForms = new int[]{2,3,8,9,10,
-						11,12,13,14,15,
-						16,20,21,76,77,
-						78,79,80,81,82,
-						83,84,85,86,87};
-
-	//	int[] selectedForms = new int[]{76};
-
-	//	int[] selectedForms = new int[]{461,455,456,457,458,459,464,466,
-	//		467,468,465,463,462,452,453,454,469,470,460,473,475,476,439,440};
-
+		Set<String> selectedFormsByName = new HashSet<>(Arrays.asList(trials));
 		Map<String,Object> extMap = new HashMap<>();
 		Set<String> tagSet = new HashSet<>(Arrays.asList(tags));
 		extMap.put(POSBasedExtractingPreprocessor.FILTER_TYPES, tagSet);
 		Set <Integer> selForms = new HashSet<Integer>();
-		for(int i : selectedForms)selForms.add(i);
+		//for(int i : selectedForms)selForms.add(i);
 
 		
 		try {
 			rep.initialize("fms.ini");
-			EntityStructureVersion umls = rep.getFormManager().getStructureVersion(name, type, date);
+			Set<GenericProperty> usedProperties = new HashSet<>(Arrays.asList(umlsProperties));
+			Set<GenericProperty> optProperties = new HashSet<>(Arrays.asList(optionalProperties));
+			EntityStructureVersion umls = rep.getFormManager().getStructureVersion(name, type,
+							date,usedProperties, optProperties);
+			System.out.println("umls :"+umls.getNumberOfEntities());
 
 			PreprocessorConfig config = new PreprocessorConfig();
 			config.setExternalSourceMap(extMap);
@@ -103,7 +127,8 @@ public class UMLS_SimpleFormMatching {
 			//config.addPreprocessingStepForProperties(PreprocessingSteps.KEYWORD_EXTRACTION, properties);
 			//config.addPreprocessingStepForProperties(PreprocessingSteps.NORMALIZE,properties);
 			Set<String> formTypes = new HashSet<String>();
-			formTypes.add("eligibility form");
+			//formTypes.add("eligibility form");
+			formTypes.add("eligibility criteria");
 			Set <EntityStructureVersion> forms = rep.getFormManager().getStructureVersionsByType(formTypes);
 			Set<EncodedEntityStructure> encodedStructures= new HashSet<EncodedEntityStructure>();
 			
@@ -117,20 +142,20 @@ public class UMLS_SimpleFormMatching {
 			
 			int size =0;
 			for (EntityStructureVersion esv: forms){
-				if (selForms.contains(esv.getStructureId())){
+				if (selectedFormsByName.contains(esv.getMetadata().getName())){
+					selForms.add(esv.getStructureId());
 					esv = preExec.preprocess(esv, config);
 					EncodedEntityStructure encForm =  EncodingManager.getInstance().encoding(esv,entTypes, true);
 					encodedStructures.add(encForm);
 					propsSrc = esv.getAvailableProperties("question","EN",null);
 					propsSrc.addAll(esv.getAvailableProperties("name", null, null));
-					System.out.println(propsSrc.toString());
 					size +=encForm.getObjIds().size();
 					//count number of documents where tokens occur
 					TFIDFTokenWeightGenerator.getInstance().initializeGlobalCount(encForm, propsSrc.toArray(new GenericProperty[]{}));
 					metaMap.put(esv.getStructureId(), esv);
 				}
 			}
-			
+			forms.clear();
 			Set <Integer> generalConceptIds = new HashSet<Integer>();
 			if (filterGeneralConcepts){
 				for (GenericEntity ge: umls.getEntities()){
@@ -156,21 +181,25 @@ public class UMLS_SimpleFormMatching {
 			configUmls.addPreprocessingStepForProperties(PreprocessingSteps.TO_LOW, propertiesUmls);
 			configUmls.addPreprocessingStepForProperties(PreprocessingSteps.STOPWORD_EXTRACTION, propertiesUmls);
 			//configUmls.addPreprocessingStepForProperties(PreprocessingSteps.NORMALIZE, propertiesUmls);
+
 			umls = preExec.preprocess(umls, configUmls);
-			umls.deduplicateProperties(propsTarget);
+
+			//umls.deduplicateProperties(propsTarget);
+			System.out.println("deduplicated: "+umls.getNumberOfEntities());
 
 			EncodedEntityStructure eesTarget = EncodingManager.getInstance().encoding(umls, true);
 			size+=eesTarget.getObjIds().size();
 
 			
 			//TokenSimilarityLookup.getInstance().computeTrigramLookup(forms, umls, rep);
-			TFIDFTokenWeightGenerator.getInstance().initializeGlobalCount(eesTarget, propsTarget.toArray(new GenericProperty[]{}));
+			TFIDFTokenWeightGenerator.getInstance().initializeGlobalCount(eesTarget,
+							propsTarget.toArray(new GenericProperty[]{}));
 			Int2FloatMap idfMap = TFIDFTokenWeightGenerator.getInstance().generateIDFValuesForAllSources(size);
 			MatchManager mm  = rep.getMatchManager();
 			Map <String,Object> globalObjects = new HashMap<String,Object>();
 			//globalObjects.put(SoftTFIDFMatcher.LOOKUP, TokenSimilarityLookup.getInstance().getLookup());
 			long startTime = System.currentTimeMillis();
-			forms.clear();
+
 			System.out.println("preprocessing finished...");
 			AnnotationMapping overallCalculatedMapping= new AnnotationMapping();
 			AnnotationMapping overallReferenceMapping = new AnnotationMapping();
@@ -178,24 +207,23 @@ public class UMLS_SimpleFormMatching {
 				if (selForms.contains(ees.getStructureId())){
 
 					Set<GenericProperty> nameProperty = metaMap.get(ees.getStructureId()).getAvailableProperties("question","EN",null);
+					/*
 					MatchOperator exact = new MatchOperator(RegisteredMatcher.EXACT_MATCHER, AggregationFunction.MAX, nameProperty,
 									propsTarget, 1f);
 					ExecutionTree treeExact = new ExecutionTree();
 					treeExact.addOperator(exact);
 					AnnotationMapping exactMapping;
-
 					exactMapping = mm.match(metaMap.get(ees.getStructureId()),ees,eesTarget,umls, treeExact, null);
 					for (EntityAnnotation ea: exactMapping.getAnnotations()){
 						System.out.println(ea);
 					}
 					System.out.println("exact:" +exactMapping.getNumberOfAnnotations());
-
 					EncodedEntityStructure restEes = ExtractOperator.extractUnannotatedEntities(ees,exactMapping);
-
-					//EncodedEntityStructure restEes = ees;
-					MatchOperator mop = new MatchOperator(RegisteredMatcher.LCS_MATCHER, AggregationFunction.MAX, propsSrc, propsTarget, 0.65f);
-					MatchOperator mop2 = new MatchOperator(RegisteredMatcher.TRIGRAM_MATCHER, AggregationFunction.MAX, propsSrc, propsTarget, 0.75f);
-					MatchOperator mop3 = new MatchOperator(RegisteredMatcher.TFIDF_MATCHER, AggregationFunction.MAX, propsSrc, propsTarget, 0.65f);
+					*/
+					EncodedEntityStructure restEes = ees;
+					MatchOperator mop = new MatchOperator(RegisteredMatcher.LCS_MATCHER, AggregationFunction.MAX, propsSrc, propsTarget, 0.6f);
+					MatchOperator mop2 = new MatchOperator(RegisteredMatcher.TRIGRAM_MATCHER, AggregationFunction.MAX, propsSrc, propsTarget, 0.65f);
+					MatchOperator mop3 = new MatchOperator(RegisteredMatcher.TFIDF_MATCHER, AggregationFunction.MAX, propsSrc, propsTarget, 0.6f);
 					MatchGroup group = new MatchGroup();
 					group.addMatcher(mop3);
 					group.addMatcher(mop);
@@ -216,18 +244,18 @@ public class UMLS_SimpleFormMatching {
 
 					Selection selection = new GroupSelection ();
 					List<String> annos = new ArrayList<>();
-					AnnotationWriter aw = new AnnotationWriter();
+					//AnnotationWriter aw = new AnnotationWriter();
 					for (EntityAnnotation ea: am.getAnnotations()){
 						annos.add(ea.getTargetAccession());
 					}
 
 					System.out.println(metaMap.get(ees.getStructureId()).getMetadata().getName()+
 									" before selection: "+am.getNumberOfAnnotations());
-					aw.writeAnnotation(metaMap.get(ees.getStructureId()),umls, am, propsSrc, propsTarget,
-									"mappings/"+metaMap.get(ees.getStructureId()).getMetadata().getName()+"_comb.csv");
+					//aw.writeAnnotation(metaMap.get(ees.getStructureId()),umls, am, propsSrc, propsTarget,
+					//				"mappings/"+metaMap.get(ees.getStructureId()).getMetadata().getName()+"_comb.csv");
 
 					am = selection.select(am, restEes, eesTarget, propsSrc, propsTarget, 0.3f, 0,1f, rep);
-					am = SetAnnotationOperator.union(AggregationFunction.MAX, am, exactMapping);
+					//am = SetAnnotationOperator.union(AggregationFunction.MAX, am, exactMapping);
 
 					VersionMetadata vm = metaMap.get(ees.getStructureId()).getMetadata();
 					String mappingName= vm.getName()+"["+vm.getTopic()+"]-"
@@ -296,8 +324,6 @@ public class UMLS_SimpleFormMatching {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (PreprocessingException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}

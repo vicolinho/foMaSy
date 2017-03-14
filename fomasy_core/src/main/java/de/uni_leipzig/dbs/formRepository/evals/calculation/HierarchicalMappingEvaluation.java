@@ -72,6 +72,8 @@ public class HierarchicalMappingEvaluation {
 
     er.setFalseNegative(falseNegatives, correct.getNumberOfAnnotations());
     er.setFalsePositives(falsePositives, correct.getNumberOfAnnotations());
+    er.setTruePositive(correct);
+    er.calculateFmeasure();
     return er;
 
   }

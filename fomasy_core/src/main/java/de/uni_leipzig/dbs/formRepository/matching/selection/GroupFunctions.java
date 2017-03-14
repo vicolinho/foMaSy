@@ -278,42 +278,9 @@ public static Map<Integer, Set<Integer>> groupSimilarUMLSConsByCommonToken(Encod
 		long anid = CantorDecoder.code(srcId, targetId);
 		Set<Integer> evidence = am.getEvidenceMap().get(anid);
 		conceptToEvidenceSet.put(targetId, evidence);
-		for (int tid : evidence){
-			List<Integer> group = umlsGroups.get(tid);
-			if (group ==null){
-				group = new ArrayList<Integer>();
-				umlsGroups.put(tid, group);
-			}
-			group.add(targetId);
-		}	
 	}
-//TODO
-	//Map<Integer, Set<Integer>> conceptTosupersets = getSupersetConceptRelationships(conceptToEvidenceSet);
+
 	Map<Integer, Set<Integer>> conceptTosupersets = getOverlappedConcepts(conceptToEvidenceSet);
-	/*
-	for (Entry<Integer,List<Integer>> entry: umlsGroups.entrySet()){
-		for (int i =0;i<entry.getValue().size();i++){
-			int concept = entry.getValue().get(i);
-			if (conceptTosupersets.containsKey(concept)){
-				boolean found =false;
-				Set<Integer> supersetConcepts  = conceptTosupersets.get(concept);
-				for (int superConcept: entry.getValue()){
-					if (supersetConcepts.contains(superConcept)){
-						found =true;
-						break;
-					}
-				}
-				if (found){
-					entry.getValue().remove(i);
-					i--;
-				}
-			}
-		}
-	}
-	Map<Integer, Set<Integer>> returnGroups = new HashMap<>();
-	for (Entry<Integer,List<Integer>> e: umlsGroups.entrySet()){
-		returnGroups.put(e.getKey(),new HashSet<>(e.getValue()));
-	}*/
 	return conceptTosupersets;
 }
 
@@ -331,10 +298,12 @@ public static Map<Integer, Set<Integer>> groupSimilarUMLSConsByCommonToken(Encod
 					if (!graphOverlap.containsVertex(entry2.getKey())){
 						graphOverlap.addVertex(entry2.getKey());
 					}
-					Set<Integer> copy = new HashSet<>(entry1.getValue());
-					copy.retainAll(entry2.getValue());
-					if (copy.size()!=0){
-						graphOverlap.addEdge(edgeId++,entry1.getKey(),entry2.getKey());
+					if (entry1.getValue() != null && entry2.getValue()!=null) {
+						Set<Integer> copy = new HashSet<>(entry1.getValue());
+						copy.retainAll(entry2.getValue());
+						if (copy.size() != 0) {
+							graphOverlap.addEdge(edgeId++, entry1.getKey(), entry2.getKey());
+						}
 					}
 				}
 			}

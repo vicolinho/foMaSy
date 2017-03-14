@@ -74,6 +74,7 @@ public class MatchManagerImpl implements MatchManager {
 			EntityAnnotation ea= new EntityAnnotation(cor.getKey(), null, null, cor.getValue(), false);
 			am.addAnnotation(ea);
 		}
+		am.setEvidenceMap(exec.getEvidenceMap());
 		return am;
 	}
 

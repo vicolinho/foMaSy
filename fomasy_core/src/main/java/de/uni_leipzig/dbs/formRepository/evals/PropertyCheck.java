@@ -48,7 +48,7 @@ public class PropertyCheck {
       GenericProperty ugp5 = new GenericProperty(6,"synonym", "SCN", "EN");
       Set<GenericProperty> usedProperties = new HashSet<>();
       usedProperties.addAll(Arrays.asList(ugp,ugp2,ugp3,ugp4,ugp5));
-      EntityStructureVersion umls = rep.getFormManager().getStructureVersion(name, type, date,usedProperties);
+      EntityStructureVersion umls = rep.getFormManager().getStructureVersion(name, type, date,usedProperties,null);
       System.out.println(umls.getNumberOfEntities());
       Set<GenericProperty> propsTarget = umls.getAvailableProperties("name", "EN", null);
       propsTarget.addAll(umls.getAvailableProperties("synonym", "EN",null));
