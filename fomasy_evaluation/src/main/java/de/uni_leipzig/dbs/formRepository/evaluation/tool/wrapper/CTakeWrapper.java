@@ -67,9 +67,12 @@ public class CTakeWrapper implements AnnotationWrapper{
               if (ia.getOntologyConceptArr() !=null) {
                 for (int i = 0; i < ia.getOntologyConceptArr().size(); i++) {
                   UmlsConcept concept = (UmlsConcept) ia.getOntologyConceptArr(i);
-                  EntityAnnotation ea = new EntityAnnotation(ge.getId(), idMap.get(concept.getCui()),
-                          ge.getAccession(), concept.getCui(),1f, false);
-                  am.addAnnotation(ea);
+                  if (idMap.containsKey(concept.getCui())) {
+                    EntityAnnotation ea = new EntityAnnotation(ge.getId(), idMap.get(concept.getCui()),
+                            ge.getAccession(), concept.getCui(), 1f, false);
+                    am.addAnnotation(ea);
+                  }
+
                 }
               }
             }

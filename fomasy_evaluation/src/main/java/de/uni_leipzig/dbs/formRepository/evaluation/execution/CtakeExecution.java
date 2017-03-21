@@ -58,8 +58,6 @@ public class CtakeExecution {
       rep.initialize(args[0]);
       Set<String> types = new HashSet<>();
 
-
-
       Map<String, Integer> cui2Id = rep.getFormManager().getIdMapping(name, date, type);
       types.add("eligibility criteria");
       Set<EntityStructureVersion> esvSet = rep.getFormManager().getStructureVersionsByType(types);
