@@ -5,6 +5,5 @@ fms.ini
 *.iml
 /datasets/
 /mappings/
-/scripts/
 /testFiles/
 /importScripts/

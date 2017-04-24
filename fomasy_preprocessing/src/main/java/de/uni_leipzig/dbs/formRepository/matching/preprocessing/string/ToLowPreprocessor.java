@@ -14,7 +14,6 @@ public class ToLowPreprocessor implements Preprocessor {
 	public EntityStructureVersion preprocess(EntityStructureVersion esv,
 			List<PreprocessProperty> propList,
 			Map<String, Object> externalSources) {
-				
 		for (GenericEntity ge: esv.getEntities()){
 			for (PreprocessProperty pp: propList){
 				Set<GenericProperty> gps = ge.getGenericProperties(pp.getName(), pp.getLang(),pp.getScope());

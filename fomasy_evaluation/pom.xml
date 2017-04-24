@@ -59,7 +59,6 @@
             <artifactId>ConceptMapper</artifactId>
             <version>2.3.1</version>
         </dependency>
-
         <dependency>
             <groupId>de.uni_leipzig.dbs</groupId>
             <artifactId>fomasy_core</artifactId>

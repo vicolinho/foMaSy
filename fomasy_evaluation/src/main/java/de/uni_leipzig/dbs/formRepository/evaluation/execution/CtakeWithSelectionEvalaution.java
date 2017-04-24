@@ -20,6 +20,8 @@ import de.uni_leipzig.dbs.formRepository.exception.VersionNotExistsException;
 import de.uni_leipzig.dbs.formRepository.matching.aggregation.AggregationFunction;
 import de.uni_leipzig.dbs.formRepository.matching.selection.GroupSelection;
 import de.uni_leipzig.dbs.formRepository.operation.SetAnnotationOperator;
+import org.apache.ctakes.ytex.kernel.metric.ConceptSimilarityService;
+import org.apache.ctakes.ytex.kernel.wsd.WordSenseDisambiguatorImpl;
 import org.apache.log4j.PropertyConfigurator;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.util.InvalidXMLException;
