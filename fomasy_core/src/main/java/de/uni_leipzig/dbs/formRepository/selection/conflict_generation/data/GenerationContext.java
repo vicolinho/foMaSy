@@ -9,11 +9,11 @@ import java.util.Set;
  */
 public class GenerationContext {
 
-  private Set<GenericProperty> groupingAttributes;
+  protected Set<GenericProperty> groupingAttributes;
 
-  private float sim_threshold;
+  protected float sim_threshold;
 
-  private String sim_func;
+  protected String sim_func;
 
 
   public Set<GenericProperty> getGroupingAttributes() {
@@ -28,8 +28,7 @@ public class GenerationContext {
     return sim_func;
   }
 
-
-  public class Builder {
+  public static class Builder {
 
     private Builder instance;
 
@@ -70,4 +69,7 @@ public class GenerationContext {
       return ctx;
     }
   }
+
 }
+
+

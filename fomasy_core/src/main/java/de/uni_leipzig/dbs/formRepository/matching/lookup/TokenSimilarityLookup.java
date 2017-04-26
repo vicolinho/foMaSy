@@ -163,7 +163,7 @@ public class TokenSimilarityLookup {
 		ExecutionTree tree = new ExecutionTree();
 		Set<GenericProperty> setGp = new HashSet<GenericProperty>();
 		setGp.add(wordgp);
-		MatchOperator mop = new MatchOperator (RegisteredMatcher.TRIGRAM_MATCHER, AggregationFunction.MAX, setGp, setGp, 0.7f);
+		MatchOperator mop = new MatchOperator (RegisteredMatcher.TRIGRAM_MATCHER, AggregationFunction.MAX, setGp, setGp, 0.6f);
 		tree.addOperator(mop);
 		AnnotationMapping mapping = rep.getMatchManager().match(wordStructure, src, trg, targetWord, tree, null);
 		Map<Integer,Set<Integer>> wordCluster = new HashMap<Integer,Set<Integer>>();
