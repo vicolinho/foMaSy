@@ -60,7 +60,10 @@ public class UMLS_SimpleFormMatching {
 					new GenericProperty(2, "synonym", "SY", "EN"),
 					new GenericProperty(3, "synonym", "SCN", "EN"),
 					new GenericProperty(4, "synonym", "FN", "EN"),
-					new GenericProperty(5, "synonym", "MH", "EN")
+					new GenericProperty(6, "synonym", "CE", "EN"),
+					new GenericProperty(7, "synonym", "NM", "EN"),
+					//new GenericProperty(8, "synonym", "OCD", "EN"),
+					//new GenericProperty(9, "synonym", null, "EN"),
 	};
 
 	public static final GenericProperty[] optionalProperties = new GenericProperty[]{
@@ -77,13 +80,7 @@ public class UMLS_SimpleFormMatching {
 					"NCT00156338","NCT00157157","NCT00160524","NCT00160706","NCT00165828"
 	};
 
-	/*
-		int[] selectedForms = new int[]{2,3,8,9,10,
-						11,12,13,14,15,
-						16,20,21,76,77,
-						78,79,80,81,82,
-						83,84,85,86,87};
-		*/
+
 
 
 	//	int[] selectedForms = new int[]{461,455,456,457,458,459,464,466,
@@ -115,7 +112,8 @@ public class UMLS_SimpleFormMatching {
 			Set<GenericProperty> usedProperties = new HashSet<>(Arrays.asList(umlsProperties));
 			Set<GenericProperty> optProperties = new HashSet<>(Arrays.asList(optionalProperties));
 			EntityStructureVersion umls = rep.getFormManager().getStructureVersion(name, type,
-							date,usedProperties, optProperties);
+							date);
+							//, usedProperties, optProperties);
 			System.out.println("umls :"+umls.getNumberOfEntities());
 
 			PreprocessorConfig config = new PreprocessorConfig();
@@ -189,8 +187,10 @@ public class UMLS_SimpleFormMatching {
 
 			EncodedEntityStructure eesTarget = EncodingManager.getInstance().encoding(umls, true);
 			size+=eesTarget.getObjIds().size();
+			umls.clear();
 
-			
+
+
 			//TokenSimilarityLookup.getInstance().computeTrigramLookup(forms, umls, rep);
 			TFIDFTokenWeightGenerator.getInstance().initializeGlobalCount(eesTarget,
 							propsTarget.toArray(new GenericProperty[]{}));
@@ -203,6 +203,8 @@ public class UMLS_SimpleFormMatching {
 			System.out.println("preprocessing finished...");
 			AnnotationMapping overallCalculatedMapping= new AnnotationMapping();
 			AnnotationMapping overallReferenceMapping = new AnnotationMapping();
+
+			VersionMetadata umlsMeta = rep.getFormManager().getMetadata(name, type, date);
 			for (EncodedEntityStructure ees:encodedStructures){
 				if (selForms.contains(ees.getStructureId())){
 
@@ -238,9 +240,9 @@ public class UMLS_SimpleFormMatching {
 					mop3.setGlobalObjects(globalObjects);
 					ExecutionTree tree = new ExecutionTree();
 					tree.addOperator(group);
-					//umls.clear();
 
-					AnnotationMapping am = mm.match(metaMap.get(restEes.getStructureId()),restEes, eesTarget,umls, tree, null);
+
+					AnnotationMapping am = mm.match(restEes, eesTarget, tree, null);
 
 					Selection selection = new GroupSelection ();
 					List<String> annos = new ArrayList<>();
@@ -251,17 +253,13 @@ public class UMLS_SimpleFormMatching {
 
 					System.out.println(metaMap.get(ees.getStructureId()).getMetadata().getName()+
 									" before selection: "+am.getNumberOfAnnotations());
-					//aw.writeAnnotation(metaMap.get(ees.getStructureId()),umls, am, propsSrc, propsTarget,
-					//				"mappings/"+metaMap.get(ees.getStructureId()).getMetadata().getName()+"_comb.csv");
-
 					am = selection.select(am, restEes, eesTarget, propsSrc, propsTarget, 0.3f, 0,1f, rep);
 					//am = SetAnnotationOperator.union(AggregationFunction.MAX, am, exactMapping);
-
 					VersionMetadata vm = metaMap.get(ees.getStructureId()).getMetadata();
 					String mappingName= vm.getName()+"["+vm.getTopic()+"]-"
-							+umls.getMetadata().getName()+"["+umls.getMetadata().getTopic()+"]_odm";
+							+umlsMeta.getName()+"["+umlsMeta.getTopic()+"]_odm";
 								AnnotationMapping am1 = rep.getMappingManager().getAnnotationMapping(vm,
-										umls.getMetadata(), mappingName);
+												umlsMeta, mappingName);
 					System.out.println("after selection:"+ am.getNumberOfAnnotations());		
 
 					for (int id : ees.getObjIds().keySet()){
@@ -290,7 +288,7 @@ public class UMLS_SimpleFormMatching {
 				}
 			}
 			MappingEvaluation eval = new MappingEvaluation();
-			EvaluationResult er = eval.getResult(overallCalculatedMapping, overallReferenceMapping, "eligibility forms", umls.getMetadata().getName());
+			EvaluationResult er = eval.getResult(overallCalculatedMapping, overallReferenceMapping, "eligibility forms", umlsMeta.getName());
 			
 			
 			System.out.println(er.getMeasures().get("precision"));
