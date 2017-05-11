@@ -12,10 +12,10 @@ import edu.uci.ics.jung.graph.DirectedGraph;
 
 public interface GraphBasedSelection {
 
-	
-	public AnnotationMapping selectAnnotationMapping(DirectedGraph<Node,Edge>graph,AnnotationMapping am, EncodedEntityStructure src,
-			EncodedEntityStructure target, Set<GenericProperty> preDomAtts,
-			Set<GenericProperty> preRanAtts, float threshold, float delta,float estimatedSize,
-			FormRepository rep);
-		
+  
+  AnnotationMapping selectAnnotationMapping(DirectedGraph<Node, Edge> graph, AnnotationMapping am, EncodedEntityStructure src,
+                                            EncodedEntityStructure target, Set<GenericProperty> preDomAtts,
+                                            Set<GenericProperty> preRanAtts, float threshold, float delta, float estimatedSize,
+                                            FormRepository rep);
+    
 }

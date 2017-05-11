@@ -31,10 +31,10 @@ public class PropertyCheck {
 
     Set<String> semTypes = new HashSet<String>();
 
-    //	int[] selectedForms = new int[]{76};
+    //  int[] selectedForms = new int[]{76};
 
-    //	int[] selectedForms = new int[]{461,455,456,457,458,459,464,466,
-    //		467,468,465,463,462,452,453,454,469,470,460,473,475,476,439,440};
+    //  int[] selectedForms = new int[]{461,455,456,457,458,459,464,466,
+    //    467,468,465,463,462,452,453,454,469,470,460,473,475,476,439,440};
 
     Map<String, Object> extMap = new HashMap<>();
 

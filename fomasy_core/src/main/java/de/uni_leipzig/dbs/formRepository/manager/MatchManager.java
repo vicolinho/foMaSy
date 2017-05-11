@@ -15,32 +15,32 @@ import de.uni_leipzig.dbs.formRepository.matching.pruning.Pruning;
 
 public interface MatchManager {
 
-	
-	public AnnotationMapping match(EntityStructureVersion srcVersion, EncodedEntityStructure encodedSrc,
-			EncodedEntityStructure encodedtarget, EntityStructureVersion targetVersion, ExecutionTree tree,
-			Pruning pruning ) throws MatchingExecutionException;
-	
-	public AnnotationMapping match(EntityStructureVersion srcVersion, EncodedEntityStructure encodedSrc,
-			EncodedEntityStructure encodedtarget, EntityStructureVersion targetVersion
-			 ) throws MatchingExecutionException;
-	
-	
-	public AnnotationMapping match(EncodedEntityStructure encodedSrc,
-			EncodedEntityStructure encodedtarget,  ExecutionTree tree,
-			Pruning pruning) throws MatchingExecutionException;
-	
-	public AnnotationMapping matchByMetaMap (EntityStructureVersion src, Set<String> entityTypes, Set<GenericProperty> props,
-			Properties metaMapProperties) throws EntityAPIException;
-	
-	public AnnotationMapping match (Set<EntityStructureVersion> srcVersions, EntityStructureVersion ontology,
-			ExecutionTree tree, Pruning pruning);
+  
+  AnnotationMapping match(EntityStructureVersion srcVersion, EncodedEntityStructure encodedSrc,
+                          EncodedEntityStructure encodedtarget, EntityStructureVersion targetVersion, ExecutionTree tree,
+                          Pruning pruning) throws MatchingExecutionException;
+  
+  AnnotationMapping match(EntityStructureVersion srcVersion, EncodedEntityStructure encodedSrc,
+                          EncodedEntityStructure encodedtarget, EntityStructureVersion targetVersion
+  ) throws MatchingExecutionException;
+  
+  
+  AnnotationMapping match(EncodedEntityStructure encodedSrc,
+                          EncodedEntityStructure encodedtarget, ExecutionTree tree,
+                          Pruning pruning) throws MatchingExecutionException;
+  
+  AnnotationMapping matchByMetaMap(EntityStructureVersion src, Set<String> entityTypes, Set<GenericProperty> props,
+                                   Properties metaMapProperties) throws EntityAPIException;
+  
+  AnnotationMapping match(Set<EntityStructureVersion> srcVersions, EntityStructureVersion ontology,
+                          ExecutionTree tree, Pruning pruning);
 
-	EncodedAnnotationMapping matchEncoded(EncodedEntityStructure encodedSrc,
-			EncodedEntityStructure encodedtarget, ExecutionTree tree,
-			Pruning pruning) throws MatchingExecutionException;
-	
-	
-	
-	
-	
+  EncodedAnnotationMapping matchEncoded(EncodedEntityStructure encodedSrc,
+      EncodedEntityStructure encodedtarget, ExecutionTree tree,
+      Pruning pruning) throws MatchingExecutionException;
+  
+  
+  
+  
+  
 }

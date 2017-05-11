@@ -13,9 +13,9 @@ import de.uni_leipzig.dbs.formRepository.matching.holistic.data.TokenCluster;
 
 public interface ClusteringAlgorithm {
 
-	
-	public Map<Integer, TokenCluster> cluster(Map<Integer,TokenCluster> initialCluster,
-			Int2ObjectMap<List<SimilarCluster>> simMatrix,Set<EncodedEntityStructure> ees , Set<GenericProperty> props,float minSim);
-		
-	
+  
+  Map<Integer, TokenCluster> cluster(Map<Integer, TokenCluster> initialCluster,
+                                     Int2ObjectMap<List<SimilarCluster>> simMatrix, Set<EncodedEntityStructure> ees, Set<GenericProperty> props, float minSim);
+    
+  
 }

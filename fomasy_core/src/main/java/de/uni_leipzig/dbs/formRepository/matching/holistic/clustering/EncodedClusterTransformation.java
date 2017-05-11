@@ -16,36 +16,36 @@ import de.uni_leipzig.dbs.formRepository.matching.preprocessing.encoding.Encodin
 
 public class EncodedClusterTransformation {
 
-	public static int id=-1;
-	
-	Logger log = Logger.getLogger(getClass());
-	public EncodedEntityStructure transformToEncodedStructure(Collection<TokenCluster> cliques, String attributeName){
-		EntityStructureVersion esv =this.transformToEntityStructureVersion(cliques, attributeName);
-		EncodedEntityStructure ees= EncodingManager.getInstance().encoding(esv, true);
-		return ees;
-	}
-	
-	
-	
-	public EntityStructureVersion transformToEntityStructureVersion (Collection<TokenCluster> collection, String attributeName){
-		VersionMetadata  vm =new VersionMetadata (id, null, null, "clusters", "keywords");
-		EntityStructureVersion esv = new EntityStructureVersion(vm);
-		StringBuffer sb = new StringBuffer();
-		GenericProperty prop = new GenericProperty(0, attributeName, null, null);
-		esv.addAvailableProperty(prop);
-		int pvId =0;
-		for (TokenCluster c :collection){
-			GenericEntity ge = new GenericEntity (c.getClusterId(), "c:"+c.getClusterId(), "cluster",id);
-			for (int tid: c.getTokenIds()){
-				sb.append(EncodingManager.getInstance().getReverseDict().get(tid)+" ");
-			}
-			PropertyValue pv = new PropertyValue(pvId++,sb.toString().trim());
-			ge.addPropertyValue(prop, pv);
-			esv.addEntity(ge);
-			sb.delete(0, sb.length());
-		
-		}
-		id--;
-		return esv;
-	}
+  public static int id=-1;
+  
+  Logger log = Logger.getLogger(getClass());
+  public EncodedEntityStructure transformToEncodedStructure(Collection<TokenCluster> cliques, String attributeName){
+    EntityStructureVersion esv =this.transformToEntityStructureVersion(cliques, attributeName);
+    EncodedEntityStructure ees= EncodingManager.getInstance().encoding(esv, true);
+    return ees;
+  }
+  
+  
+  
+  public EntityStructureVersion transformToEntityStructureVersion (Collection<TokenCluster> collection, String attributeName){
+    VersionMetadata  vm =new VersionMetadata (id, null, null, "clusters", "keywords");
+    EntityStructureVersion esv = new EntityStructureVersion(vm);
+    StringBuffer sb = new StringBuffer();
+    GenericProperty prop = new GenericProperty(0, attributeName, null, null);
+    esv.addAvailableProperty(prop);
+    int pvId =0;
+    for (TokenCluster c :collection){
+      GenericEntity ge = new GenericEntity (c.getClusterId(), "c:"+c.getClusterId(), "cluster",id);
+      for (int tid: c.getTokenIds()){
+        sb.append(EncodingManager.getInstance().getReverseDict().get(tid)+" ");
+      }
+      PropertyValue pv = new PropertyValue(pvId++,sb.toString().trim());
+      ge.addPropertyValue(prop, pv);
+      esv.addEntity(ge);
+      sb.delete(0, sb.length());
+    
+    }
+    id--;
+    return esv;
+  }
 }

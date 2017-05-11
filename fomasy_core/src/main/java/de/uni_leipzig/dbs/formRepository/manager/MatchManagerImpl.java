@@ -29,75 +29,75 @@ import de.uni_leipzig.dbs.formRepository.util.CantorDecoder;
 
 public class MatchManagerImpl implements MatchManager {
 
-	
-	Logger log = Logger.getLogger(getClass());
-	public AnnotationMapping match(EntityStructureVersion srcVersion, EncodedEntityStructure encodedSrc,
-			EncodedEntityStructure encodedtarget, EntityStructureVersion targetVersion, ExecutionTree tree,
-			 Pruning pruning) throws MatchingExecutionException{
-		MatcherWorkflowExecuter exec = new 	MatcherWorkflowExecuter();
-		Long2FloatMap encodedMapping = exec.match(encodedSrc, encodedtarget, tree, pruning);
-		AnnotationMapping am = new AnnotationMapping();
-		am.setEvidenceMap(exec.getEvidenceMap());
-		Set<VersionMetadata> involvedStructures = new HashSet<VersionMetadata>();
-		involvedStructures.add(srcVersion.getMetadata());
-		involvedStructures.add(targetVersion.getMetadata());
-		for (Entry<Long,Float> cor : encodedMapping.entrySet()){
-			int srcId = (int) CantorDecoder.decode_a(cor.getKey());
-			int targetId= (int) CantorDecoder.decode_b(cor.getKey());
-			EntityAnnotation ea = new EntityAnnotation (srcId, targetId,
-					srcVersion.getEntity(srcId).getAccession(), targetVersion.getEntity(targetId).getAccession(),
-					cor.getValue(), false);
-			am.addAnnotation(ea);
-		}
-		return am;
-		
-	}
+  
+  Logger log = Logger.getLogger(getClass());
+  public AnnotationMapping match(EntityStructureVersion srcVersion, EncodedEntityStructure encodedSrc,
+      EncodedEntityStructure encodedtarget, EntityStructureVersion targetVersion, ExecutionTree tree,
+       Pruning pruning) throws MatchingExecutionException{
+    MatcherWorkflowExecuter exec = new   MatcherWorkflowExecuter();
+    Long2FloatMap encodedMapping = exec.match(encodedSrc, encodedtarget, tree, pruning);
+    AnnotationMapping am = new AnnotationMapping();
+    am.setEvidenceMap(exec.getEvidenceMap());
+    Set<VersionMetadata> involvedStructures = new HashSet<VersionMetadata>();
+    involvedStructures.add(srcVersion.getMetadata());
+    involvedStructures.add(targetVersion.getMetadata());
+    for (Entry<Long,Float> cor : encodedMapping.entrySet()){
+      int srcId = (int) CantorDecoder.decode_a(cor.getKey());
+      int targetId= (int) CantorDecoder.decode_b(cor.getKey());
+      EntityAnnotation ea = new EntityAnnotation (srcId, targetId,
+          srcVersion.getEntity(srcId).getAccession(), targetVersion.getEntity(targetId).getAccession(),
+          cor.getValue(), false);
+      am.addAnnotation(ea);
+    }
+    return am;
+    
+  }
 
-	public AnnotationMapping match(EncodedEntityStructure encodedSrc,
-			EncodedEntityStructure encodedtarget, ExecutionTree tree,
-			Pruning pruning) throws MatchingExecutionException {
-		MatcherWorkflowExecuter exec = new 	MatcherWorkflowExecuter();
-		Long2FloatMap encodedMapping = exec.match(encodedSrc, encodedtarget, tree, pruning);
-		AnnotationAPI api = APIFactory.getInstance().getAnnotationAPI();
-		AnnotationMapping am = api.getAnnotationMapping(encodedMapping, encodedSrc.getStructureId(), encodedtarget.getStructureId());
-		am.setEvidenceMap(exec.getEvidenceMap());
-		return am;
-	}
+  public AnnotationMapping match(EncodedEntityStructure encodedSrc,
+      EncodedEntityStructure encodedtarget, ExecutionTree tree,
+      Pruning pruning) throws MatchingExecutionException {
+    MatcherWorkflowExecuter exec = new   MatcherWorkflowExecuter();
+    Long2FloatMap encodedMapping = exec.match(encodedSrc, encodedtarget, tree, pruning);
+    AnnotationAPI api = APIFactory.getInstance().getAnnotationAPI();
+    AnnotationMapping am = api.getAnnotationMapping(encodedMapping, encodedSrc.getStructureId(), encodedtarget.getStructureId());
+    am.setEvidenceMap(exec.getEvidenceMap());
+    return am;
+  }
 
-	public EncodedAnnotationMapping matchEncoded(EncodedEntityStructure encodedSrc,
-			EncodedEntityStructure encodedtarget, ExecutionTree tree,
-			Pruning pruning) throws MatchingExecutionException {
-		MatcherWorkflowExecuter exec = new 	MatcherWorkflowExecuter();
-		Long2FloatMap encodedMapping = exec.match(encodedSrc, encodedtarget, tree, pruning);
-		EncodedAnnotationMapping am = new EncodedAnnotationMapping();
-		for (Entry<Long,Float> cor : encodedMapping.entrySet()){
-			EntityAnnotation ea= new EntityAnnotation(cor.getKey(), null, null, cor.getValue(), false);
-			am.addAnnotation(ea);
-		}
-		am.setEvidenceMap(exec.getEvidenceMap());
-		return am;
-	}
+  public EncodedAnnotationMapping matchEncoded(EncodedEntityStructure encodedSrc,
+      EncodedEntityStructure encodedtarget, ExecutionTree tree,
+      Pruning pruning) throws MatchingExecutionException {
+    MatcherWorkflowExecuter exec = new   MatcherWorkflowExecuter();
+    Long2FloatMap encodedMapping = exec.match(encodedSrc, encodedtarget, tree, pruning);
+    EncodedAnnotationMapping am = new EncodedAnnotationMapping();
+    for (Entry<Long,Float> cor : encodedMapping.entrySet()){
+      EntityAnnotation ea= new EntityAnnotation(cor.getKey(), null, null, cor.getValue(), false);
+      am.addAnnotation(ea);
+    }
+    am.setEvidenceMap(exec.getEvidenceMap());
+    return am;
+  }
 
-	public AnnotationMapping match(Set<EntityStructureVersion> srcVersions,
-			EntityStructureVersion ontology, ExecutionTree tree, Pruning pruning) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+  public AnnotationMapping match(Set<EntityStructureVersion> srcVersions,
+      EntityStructureVersion ontology, ExecutionTree tree, Pruning pruning) {
+    // TODO Auto-generated method stub
+    return null;
+  }
 
-	public AnnotationMapping match(EntityStructureVersion srcVersion,
-			EncodedEntityStructure encodedSrc,
-			EncodedEntityStructure encodedtarget,
-			EntityStructureVersion targetVersion)
-			throws MatchingExecutionException {
-		// TODO Auto-generated method stub
-		return null;
-	}
+  public AnnotationMapping match(EntityStructureVersion srcVersion,
+      EncodedEntityStructure encodedSrc,
+      EncodedEntityStructure encodedtarget,
+      EntityStructureVersion targetVersion)
+      throws MatchingExecutionException {
+    // TODO Auto-generated method stub
+    return null;
+  }
 
-	public AnnotationMapping matchByMetaMap(EntityStructureVersion src,
-			Set<String> entityTypes, Set<GenericProperty> props,
-			Properties metaMapProperties) throws EntityAPIException {
-		MetaMapWrapper wrapper = new MetaMapWrapper ();
-		
-		return wrapper.match(src, entityTypes, props, metaMapProperties);
-	}
+  public AnnotationMapping matchByMetaMap(EntityStructureVersion src,
+      Set<String> entityTypes, Set<GenericProperty> props,
+      Properties metaMapProperties) throws EntityAPIException {
+    MetaMapWrapper wrapper = new MetaMapWrapper ();
+    
+    return wrapper.match(src, entityTypes, props, metaMapProperties);
+  }
 }

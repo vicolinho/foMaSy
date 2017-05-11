@@ -77,7 +77,7 @@ public class OntologyClusteringEvaluation {
     Int2FloatMap map = TFIDFTokenWeightGenerator.getInstance().generateIDFValuesForAllSources(ees.getObjIds().size());
     FileWriter fw = new FileWriter("tokenDistribution.csv");
     for (Map.Entry<Integer,Float> e: map.entrySet()){
-      fw.append(EncodingManager.getInstance().getReverseDict().get(e.getKey())+"\t"+e.getValue()+
+      fw.append(EncodingManager.getInstance().getReverseDict().get(e.getKey())+"  "+e.getValue()+
               System.getProperty("line.separator"));
     }
 

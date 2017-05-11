@@ -9,9 +9,9 @@ import de.uni_leipzig.dbs.formRepository.util.MappingImportMetadata;
 
 public interface MappingManager {
 
-	void importExternalAnnotation(MappingImportMetadata metadata) throws ImportAnnotationException;
+  void importExternalAnnotation(MappingImportMetadata metadata) throws ImportAnnotationException;
 
-	void importAnnotation(AnnotationMapping mapping);
-	
-	AnnotationMapping getAnnotationMapping(VersionMetadata src, VersionMetadata target,String name);
+  void importAnnotation(AnnotationMapping mapping);
+  
+  AnnotationMapping getAnnotationMapping(VersionMetadata src, VersionMetadata target,String name);
 }

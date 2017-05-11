@@ -11,7 +11,7 @@ import edu.uci.ics.jung.algorithms.shortestpath.Distance;
 import edu.uci.ics.jung.graph.Hypergraph;
 
 public class ComponentsClosnessCentrality<V,E> extends ComponentDistanceCentralityScorer<V,E>{
-	 /**
+   /**
      * Creates an instance using the specified vertex/vertex distance metric.
      * @param graph the input
      * @param distance the vertex/vertex distance metric.

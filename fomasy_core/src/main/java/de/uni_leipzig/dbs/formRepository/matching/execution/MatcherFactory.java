@@ -16,53 +16,53 @@ import de.uni_leipzig.dbs.formRepository.matching.Matcher;
  */
 public class MatcherFactory {
 
-	
-	private static MatcherFactory instance;
-	private Map<String, String> matcherClassMapping;
-	
-	
-	MatcherFactory (){
-		this.matcherClassMapping = new HashMap<String,String>();
-		this.registerMatcher(RegisteredMatcher.TRIGRAM_MATCHER, "de.uni_leipzig.dbs.formRepository.matching.string.TrigramMatcher");
-		this.registerMatcher(RegisteredMatcher.TFIDF_MATCHER, "de.uni_leipzig.dbs.formRepository.matching.token.TFIDFMatcher");
-		this.registerMatcher(RegisteredMatcher.TFIDF_WINDOW_MATCHER, "de.uni_leipzig.dbs.formRepository.matching.token.TFIDFWindowMatcher");
-		this.registerMatcher(RegisteredMatcher.LCS_MATCHER, "de.uni_leipzig.dbs.formRepository.matching.token.LCSMatcher");
-		this.registerMatcher(RegisteredMatcher.SOFT_TFIDF_WND_MATCHER, "de.uni_leipzig.dbs.formRepository.matching.token.SoftTFIDFMatcher");
-		this.registerMatcher(RegisteredMatcher.EXACT_MATCHER,  "de.uni_leipzig.dbs.formRepository.matching.exact.ExactMatcher");
-	}
-	
-	public void registerMatcher (String name, String classLocation){
-		this.matcherClassMapping.put(name, classLocation);
-	}
-	
-	public Matcher getRegisteredMatcher(String name, 
-			Map<GenericProperty, Integer> srcProp, Map<GenericProperty, Integer> targetProperties,
-			Set<GenericProperty> srcComparingProperties, Set<GenericProperty> targetComparingProps) throws UnknownMatcherException, ClassNotFoundException{
-		String className = this.matcherClassMapping.get(name);
-		if (className == null){
-			throw new UnknownMatcherException("not registered Matcher:"+name);
-		}
-		try {
-			Matcher matcher = (Matcher) Class.forName(className).newInstance();
-			matcher.setComparingProperties(srcProp, targetProperties, srcComparingProperties, targetComparingProps);
-			return matcher;
-		} catch (InstantiationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return null;
-		
-	}
-	
-	
-	public static MatcherFactory getInstance(){
-		if (instance ==null){
-			instance = new MatcherFactory();
-		}
-		return instance;
-	}
-	
+  
+  private static MatcherFactory instance;
+  private Map<String, String> matcherClassMapping;
+  
+  
+  MatcherFactory (){
+    this.matcherClassMapping = new HashMap<String,String>();
+    this.registerMatcher(RegisteredMatcher.TRIGRAM_MATCHER, "de.uni_leipzig.dbs.formRepository.matching.string.TrigramMatcher");
+    this.registerMatcher(RegisteredMatcher.TFIDF_MATCHER, "de.uni_leipzig.dbs.formRepository.matching.token.TFIDFMatcher");
+    this.registerMatcher(RegisteredMatcher.TFIDF_WINDOW_MATCHER, "de.uni_leipzig.dbs.formRepository.matching.token.TFIDFWindowMatcher");
+    this.registerMatcher(RegisteredMatcher.LCS_MATCHER, "de.uni_leipzig.dbs.formRepository.matching.token.LCSMatcher");
+    this.registerMatcher(RegisteredMatcher.SOFT_TFIDF_WND_MATCHER, "de.uni_leipzig.dbs.formRepository.matching.token.SoftTFIDFMatcher");
+    this.registerMatcher(RegisteredMatcher.EXACT_MATCHER,  "de.uni_leipzig.dbs.formRepository.matching.exact.ExactMatcher");
+  }
+  
+  public void registerMatcher (String name, String classLocation){
+    this.matcherClassMapping.put(name, classLocation);
+  }
+  
+  public Matcher getRegisteredMatcher(String name, 
+      Map<GenericProperty, Integer> srcProp, Map<GenericProperty, Integer> targetProperties,
+      Set<GenericProperty> srcComparingProperties, Set<GenericProperty> targetComparingProps) throws UnknownMatcherException, ClassNotFoundException{
+    String className = this.matcherClassMapping.get(name);
+    if (className == null){
+      throw new UnknownMatcherException("not registered Matcher:"+name);
+    }
+    try {
+      Matcher matcher = (Matcher) Class.forName(className).newInstance();
+      matcher.setComparingProperties(srcProp, targetProperties, srcComparingProperties, targetComparingProps);
+      return matcher;
+    } catch (InstantiationException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    } catch (IllegalAccessException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+    return null;
+    
+  }
+  
+  
+  public static MatcherFactory getInstance(){
+    if (instance ==null){
+      instance = new MatcherFactory();
+    }
+    return instance;
+  }
+  
 }

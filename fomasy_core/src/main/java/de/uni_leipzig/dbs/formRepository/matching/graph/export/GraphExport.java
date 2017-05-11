@@ -68,24 +68,24 @@ public class GraphExport {
   public void writeGraphCSV(String file, DirectedGraph<Node, Edge> graph, Map<Integer, GenericEntity> nodes, String string) {
     try {
       FileWriter fw = new FileWriter("edge." + file);
-      fw.append("source\ttarget\tweight\tabsoluteCooccurrence\ttotalAnnotations" + System.getProperty("line.separator"));
+      fw.append("source  target  weight  absoluteCooccurrence  totalAnnotations" + System.getProperty("line.separator"));
       for (Edge e : graph.getEdges()) {
         Node src = graph.getSource(e);
         Node target = graph.getDest(e);
-        fw.append(nodes.get(src.getId()).getAccession() + "\t" + nodes.get(target.getId()).getAccession()
-                + "\t" + e.getWeight() + "\t" + e.getCooccurCount() + "\t" +
+        fw.append(nodes.get(src.getId()).getAccession() + "  " + nodes.get(target.getId()).getAccession()
+                + "  " + e.getWeight() + "  " + e.getCooccurCount() + "  " +
                 e.getTotal() + System.getProperty("line.separator"));
       }
       fw.close();
 
       FileWriter fw2 = new FileWriter("node." + file);
-      fw2.append("id\trepresentative" + System.getProperty("line.separator"));
+      fw2.append("id  representative" + System.getProperty("line.separator"));
       for (GenericEntity ge : nodes.values()) {
         List<String> values = ge.getPropertyValues(string, null, null);
         String v = "";
         if (values.size() != 0)
           v = values.get(0);
-        fw2.append(ge.getAccession() + "\t" + v + System.getProperty("line.separator"));
+        fw2.append(ge.getAccession() + "  " + v + System.getProperty("line.separator"));
       }
       fw2.close();
     } catch (IOException e1) {
@@ -97,17 +97,17 @@ public class GraphExport {
   public void writeGraphCSV(String file, DirectedGraph<Node, Edge> graph) {
     try {
       FileWriter fw = new FileWriter(file + "edge.csv");
-      fw.append("source\ttarget\tweight\tabsoluteCooccurrence\ttotalAnnotations\tedgeType" + System.getProperty("line.separator"));
+      fw.append("source  target  weight  absoluteCooccurrence  totalAnnotations  edgeType" + System.getProperty("line.separator"));
       for (Edge e : graph.getEdges()) {
         Node src = graph.getSource(e);
         Node target = graph.getDest(e);
-        fw.append(src.getId() + "\t" + target.getId() + "\t" + e.getWeight() + "\t" + e.getCooccurCount() + "\t" +
-                e.getTotal() + "\t" + e.getType() + System.getProperty("line.separator"));
+        fw.append(src.getId() + "  " + target.getId() + "  " + e.getWeight() + "  " + e.getCooccurCount() + "  " +
+                e.getTotal() + "  " + e.getType() + System.getProperty("line.separator"));
       }
       fw.close();
 
       FileWriter fw2 = new FileWriter(file + "node.csv");
-      fw2.append("id\trepresentative" + System.getProperty("line.separator"));
+      fw2.append("id  representative" + System.getProperty("line.separator"));
       for (Node n : graph.getVertices()) {
         fw2.append(n.getId() + System.getProperty("line.separator"));
       }

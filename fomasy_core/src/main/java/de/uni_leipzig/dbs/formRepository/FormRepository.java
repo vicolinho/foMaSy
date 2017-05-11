@@ -14,12 +14,12 @@ import de.uni_leipzig.dbs.formRepository.manager.ClusterManager;
  */
 public interface FormRepository extends RepositoryServer{
 
-	public FormManager getFormManager();
-	public MatchManager getMatchManager();
-	public MappingManager getMappingManager();
-	public ClusterManager getClusterManager();
-	public GraphManager getGraphManager();
-	
+  FormManager getFormManager();
+  MatchManager getMatchManager();
+  MappingManager getMappingManager();
+  ClusterManager getClusterManager();
+  GraphManager getGraphManager();
+  
 
-	
+  
 }

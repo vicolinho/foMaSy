@@ -9,14 +9,14 @@ import de.uni_leipzig.dbs.formRepository.dataModel.encoding.EncodedEntityStructu
 
 public interface Selection {
 
-	
-	public AnnotationMapping select(AnnotationMapping am, float threshold, float delta);
-	
-	
+  
+  AnnotationMapping select(AnnotationMapping am, float threshold, float delta);
+  
+  
 
 
-	AnnotationMapping select(AnnotationMapping am, EncodedEntityStructure src,
-			EncodedEntityStructure target, Set<GenericProperty> preDomAtts,
-			Set<GenericProperty> preRanAtts, float threshold, float delta,
-			float avgEntitySize, FormRepository rep);
+  AnnotationMapping select(AnnotationMapping am, EncodedEntityStructure src,
+      EncodedEntityStructure target, Set<GenericProperty> preDomAtts,
+      Set<GenericProperty> preRanAtts, float threshold, float delta,
+      float avgEntitySize, FormRepository rep);
 }

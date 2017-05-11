@@ -76,11 +76,11 @@ public class BaselineEvaluation{
           "Functional Concept","Conceptual Entity","Temporal Concept"};
 
 /*
-	static int[] selectedForms = new int[]{3,2,8,9,10,
-		11,12,13,14,15,
-		16,20,21,76,77,
-		78,79,80,81,82,
-	83,84,85,86,87};*/
+  static int[] selectedForms = new int[]{3,2,8,9,10,
+    11,12,13,14,15,
+    16,20,21,76,77,
+    78,79,80,81,82,
+  83,84,85,86,87};*/
 
   //static int[] selectedForms = new int[]{76};
 
@@ -91,13 +91,13 @@ public class BaselineEvaluation{
           77,78,79,80,81,
           82,83,84,85,86};
 
-  //	439,440
-//	461,455,456,457,458,459,464,466,467,468,465,463,462,452,453,454,469,470,460,473,475,476
-//	static int[] selectedForms = new int[]{450, 451, 452, 453, 454, 455, 456, 457, 458, 459, 460, 461, 462, 463,
-//	 464, 465, 466, 467, 468, 469, 470, 471, 472, 473,
-//	 474, 475, 476, 477, 478, 479, 480, 481, 482};
-//	static int[] selectedForms = new int[]{461,455,456,457,458,459,464,466,
-//		467,468,465,463,462,452,453,454,469,470,460,473,475,476,439,440};
+  //439,440
+//461,455,456,457,458,459,464,466,467,468,465,463,462,452,453,454,469,470,460,473,475,476
+//static int[] selectedForms = new int[]{450, 451, 452, 453, 454, 455, 456, 457, 458, 459, 460, 461, 462, 463,
+// 464, 465, 466, 467, 468, 469, 470, 471, 472, 473,
+//474, 475, 476, 477, 478, 479, 480, 481, 482};
+//static int[] selectedForms = new int[]{461,455,456,457,458,459,464,466,
+//467,468,465,463,462,452,453,454,469,470,460,473,475,476,439,440};
   static Set <Integer> selForms = new HashSet<Integer>();
   static String[] t = new String[]{"CD","FW","JJ","RBS","JJR","JJS","LS","NN","NNS","NNP","RB","RBS","SYM","IN"};
   static float threshold =0.6f;
@@ -149,7 +149,7 @@ public class BaselineEvaluation{
       HashMap<Integer,EntityStructureVersion> map = new HashMap<>();
       Set<String> types = new HashSet<String>();
       types.add("eligibility form");
-//			types.add("quality assurance");
+//      types.add("quality assurance");
       Set<EntityStructureVersion> set = rep.getFormManager().getStructureVersionsByType(types);
       for (EntityStructureVersion esv:set){
         map.put(esv.getStructureId(), esv);
@@ -225,9 +225,9 @@ public class BaselineEvaluation{
             long restMatchTime = System.currentTimeMillis();
             AnnotationMapping restAnno = getAnnoations(umlsEnc, umls, ees1,map.get(ees1.getStructureId()),
                     formProperties, umlsProperties, idfMap, blocks, rep);
-						/*
-						 * filtering general correspondences from mapping
-						 */
+            /*
+             * filtering general correspondences from mapping
+             */
             Set<EntityAnnotation> remAnno = new HashSet<>();
             for (EntityAnnotation ea: restAnno.getAnnotations()){
               if (toFilteringConceptIds.contains(ea.getTargetId())){
@@ -270,9 +270,9 @@ public class BaselineEvaluation{
       long endTime = System.currentTimeMillis();
       System.out.println(((endTime-startTime)/1000/60));
 
-			/*
-			 * evaluation
-			 */
+      /*
+       * evaluation
+       */
       MappingEvaluation eval = new MappingEvaluation();
       for (Entry<Integer,AnnotationMapping> entry :annoMap.entrySet()){
         if (onlySelectedForms){
@@ -299,9 +299,9 @@ public class BaselineEvaluation{
           }
         }
       }
-			/*
-			 * retrieve reference mapping
-			 */
+      /*
+       * retrieve reference mapping
+       */
       Set<Integer> questionIds = new HashSet<Integer>();
       AnnotationMapping referenceMapping = new AnnotationMapping();
       set = rep.getFormManager().getStructureVersionsByType(types);
@@ -349,9 +349,9 @@ public class BaselineEvaluation{
       System.out.println(er.getMeasures().get("precision"));
       System.out.println(er.getMeasures().get("recall"));
       System.out.println(er.getMeasures().get("fmeasure"));
-      log.info("preprocessing\t"+preprocessingTime);
-      log.info("identification\t"+matchTime);
-      log.info("selection\t"+selectionTime);
+      log.info("preprocessing  "+preprocessingTime);
+      log.info("identification  "+matchTime);
+      log.info("selection  "+selectionTime);
 
     } catch (VersionNotExistsException e) {
       // TODO Auto-generated catch block

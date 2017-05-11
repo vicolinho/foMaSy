@@ -39,7 +39,7 @@ public class UMLS_Extract {
         while (rs2.next()){
           concepts.add(rs2.getString(1));
         }
-        System.out.println(c+"\t"+ concepts.size());
+        System.out.println(c+"  "+ concepts.size());
       }
       Statement stmt2 = con.createStatement();
       ResultSet rs3 = stmt2.executeQuery("Select cc.accession from covered_concepts cc");

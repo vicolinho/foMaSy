@@ -24,74 +24,74 @@ import de.uni_leipzig.dbs.formRepository.util.PropertyReader;
  */
 public class FormRepositoryImpl implements FormRepository{
 
-	
-	
-	
-	/** 
-	 * initialize the database configurations
-	 */
-	public void initialize (String file) throws InstantiationException, IllegalAccessException, ClassNotFoundException, InitializationException{
-		
-		Properties props =null;
-		try {
-			props = PropertyReader.readIniFile(file);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			throw new InitializationException ("missing ini file");
-		}
-		String stringType = (String) props.get("dataSourceType");	
-		DataStoreType type=null;
-		if (stringType.equals("rdbms")){
-			type = DataStoreType.RDBMS;
-		}else{
-			throw new InitializationException (" type");
-		}
-		
-		DatabaseConnectionData data = new DatabaseConnectionData();
-		data.setDriver(props.getProperty("driver"));
-		data.setUser(props.getProperty("user"));
-		data.setUrl(props.getProperty("url"));
-		data.setPw(props.getProperty("password"));
-		GlobalRepositorySettings.getInstance().setType(type);
-		DataStoreInitializerFactory.getInitializer(type, data).initialize();
-		
-		
-	}
-	
-	public void initialize (Properties map){
-		
-	}
-	
-	/**
-	 * return the form manager manager that is necessary to get entity structures by name or by type
-	 */
-	public FormManager getFormManager(){
-		FormManager fm = ManagerFactory.getFormManager();
-		return fm;
-	}
+  
+  
+  
+  /** 
+   * initialize the database configurations
+   */
+  public void initialize (String file) throws InstantiationException, IllegalAccessException, ClassNotFoundException, InitializationException{
+    
+    Properties props =null;
+    try {
+      props = PropertyReader.readIniFile(file);
+    } catch (IOException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+      throw new InitializationException ("missing ini file");
+    }
+    String stringType = (String) props.get("dataSourceType");  
+    DataStoreType type=null;
+    if (stringType.equals("rdbms")){
+      type = DataStoreType.RDBMS;
+    }else{
+      throw new InitializationException (" type");
+    }
+    
+    DatabaseConnectionData data = new DatabaseConnectionData();
+    data.setDriver(props.getProperty("driver"));
+    data.setUser(props.getProperty("user"));
+    data.setUrl(props.getProperty("url"));
+    data.setPw(props.getProperty("password"));
+    GlobalRepositorySettings.getInstance().setType(type);
+    DataStoreInitializerFactory.getInitializer(type, data).initialize();
+    
+    
+  }
+  
+  public void initialize (Properties map){
+    
+  }
+  
+  /**
+   * return the form manager manager that is necessary to get entity structures by name or by type
+   */
+  public FormManager getFormManager(){
+    FormManager fm = ManagerFactory.getFormManager();
+    return fm;
+  }
 
 
-	public MappingManager getMappingManager() {
-		return ManagerFactory.getMappingManger();
-		
-	}
+  public MappingManager getMappingManager() {
+    return ManagerFactory.getMappingManger();
+    
+  }
 
-	@Override
-	public MatchManager getMatchManager() {
-		MatchManager mm = ManagerFactory.getMatchManager();
-		return mm;
-	}
+  @Override
+  public MatchManager getMatchManager() {
+    MatchManager mm = ManagerFactory.getMatchManager();
+    return mm;
+  }
 
-	@Override
-	public ClusterManager getClusterManager() {
-		ClusterManager cm = ManagerFactory.getClusterManager();
-		return cm;
-	}
+  @Override
+  public ClusterManager getClusterManager() {
+    ClusterManager cm = ManagerFactory.getClusterManager();
+    return cm;
+  }
 
-	@Override
-	public GraphManager getGraphManager() {
-		GraphManager gm = ManagerFactory.getGraphManager();
-		return gm;
-	}
+  @Override
+  public GraphManager getGraphManager() {
+    GraphManager gm = ManagerFactory.getGraphManager();
+    return gm;
+  }
 }
