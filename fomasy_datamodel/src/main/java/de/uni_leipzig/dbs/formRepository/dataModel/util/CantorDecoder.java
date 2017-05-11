@@ -34,21 +34,8 @@ package de.uni_leipzig.dbs.formRepository.dataModel.util;
 		 * @return second number of the number pair
 		 */
 		public static long decode_b(long  c) {
-			//long s = s(c);
 			long b  = (long) Math.floor(Math.sqrt(0.25 + 2*c) - 0.5);
 			return c -b*(b+1)/2;
-		}
-		
-		/**
-		 * The method returns the value for the s-function.
-		 * @param n number to be decoded
-		 * @return s-value
-		 */
-		private static long s(long n) {
-			for (int i=1;;i++) {
-				if ((0.5*i*(i+1))<=n) continue;
-				else return i-1;
-			}
 		}
 	}
 

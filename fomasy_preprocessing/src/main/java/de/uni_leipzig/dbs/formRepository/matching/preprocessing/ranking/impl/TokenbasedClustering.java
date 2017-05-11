@@ -8,6 +8,7 @@ import de.uni_leipzig.dbs.formRepository.matching.preprocessing.ranking.Ontology
 import edu.uci.ics.jung.algorithms.cluster.WeakComponentClusterer;
 import edu.uci.ics.jung.graph.UndirectedGraph;
 import edu.uci.ics.jung.graph.UndirectedSparseGraph;
+
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 
@@ -29,7 +30,7 @@ public class TokenbasedClustering implements OntologyClustering {
     float threshold = (float) props.get(THRESHOLD);
     UndirectedGraph<ClusterElement, Integer> graph = this.buildGraph(clusterElements,props, type, threshold);
     WeakComponentClusterer<ClusterElement, Integer> clusterer = new WeakComponentClusterer<>();
-    Set<Set<ClusterElement>> clusterSets = clusterer.transform(graph);
+    Set<Set<ClusterElement>> clusterSets = clusterer.apply(graph);
     Collection <Cluster> clusters= new HashSet<>();
     for (Set<ClusterElement> cluster: clusterSets){
       Cluster c = new PropertyCluster();

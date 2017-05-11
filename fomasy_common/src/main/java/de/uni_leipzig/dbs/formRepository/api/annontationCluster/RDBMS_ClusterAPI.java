@@ -1,7 +1,5 @@
 package de.uni_leipzig.dbs.formRepository.api.annontationCluster;
 
-import it.unimi.dsi.fastutil.ints.Int2IntMap;
-import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
@@ -19,8 +17,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-
-import com.mysql.jdbc.log.Log;
 
 import de.uni_leipzig.dbs.formRepository.api.annotation.entity.RDBMS_EntityAPI;
 import de.uni_leipzig.dbs.formRepository.api.util.DBConHandler;

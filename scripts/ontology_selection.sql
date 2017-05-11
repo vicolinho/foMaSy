@@ -3,8 +3,9 @@
  where a.target_entity_id = e.ent_id 
  AND a.src_entity_id = src.ent_id
  AND e.accession = nc.acc 
- AND src.ent_struct_id_fk = es.ent_struct_id AND
-  es.name  in ("NCT00168051","NCT00355849","NCT00175903","NCT00356109","NCT00357227",
+ AND src.ent_struct_id_fk = es.ent_struct_id 
+ AND es.ent_type = 'eligibility criteria' 
+ AND es.name  in ("NCT00168051","NCT00355849","NCT00175903","NCT00356109","NCT00357227",
 					"NCT00359762","NCT00372229","NCT00190047","NCT00373373","NCT00195507",
 					"NCT00376337","NCT00384046","NCT00385372","NCT00391287","NCT00391872",
 					"NCT00393692","NCT00006045","NCT00048295","NCT00151112","NCT00153062",
@@ -14,7 +15,8 @@
  Select * from annotations a, annotation_mapping am, entity_structure es 
  where a.mapping_id_fk = am.mapping_id 
  AND es.ent_struct_id = am.src_ent_struct_version_id_fk
- AND es.ent_type = 'eligibility criteria' AND es.name in ("NCT00168051","NCT00355849","NCT00175903","NCT00356109","NCT00357227",
+ AND es.ent_type = 'eligibility criteria' 
+ AND es.name in ("NCT00168051","NCT00355849","NCT00175903","NCT00356109","NCT00357227",
 					"NCT00359762","NCT00372229","NCT00190047","NCT00373373","NCT00195507",
 					"NCT00376337","NCT00384046","NCT00385372","NCT00391287","NCT00391872",
 					"NCT00393692","NCT00006045","NCT00048295","NCT00151112","NCT00153062",

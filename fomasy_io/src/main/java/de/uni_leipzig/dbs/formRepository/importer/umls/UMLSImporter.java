@@ -39,9 +39,10 @@ public class UMLSImporter extends PreSourceImporter{
 			String pw = importer.getPw();
 			String source =importer.getSource();
 			boolean isRelImport = importer.isRelationImport();
+			String query = importer.getSqlQuery();
 			try {
 				con = DriverManager.getConnection(source, user, pw);
-				this.ents = new ArrayList<ImportEntity>(this.getUMLSData(con).values());
+				this.ents = new ArrayList<ImportEntity>(this.getUMLSData(con, query).values());
 				List<ImportRelationship> rels = new ArrayList<ImportRelationship>();
 				if (isRelImport){
 					this.rels = this.getRelations();
@@ -122,18 +123,13 @@ public class UMLSImporter extends PreSourceImporter{
 		return builder.toString();
 	}
 	
-	private HashMap<String, ImportEntity> getUMLSData(Connection conn) throws ImportException {
+	private HashMap<String, ImportEntity> getUMLSData(Connection conn, String query) throws ImportException {
 		dataset = new HashMap<String, ImportEntity>();
 		float start = System.currentTimeMillis();
 		Map<String,Set<String>> insertLUIS = new HashMap<String,Set<String>>();
 		try {
 			
 			System.out.println("Get UMLS CUIs + concept information (name, synonyms..) ..");
-
-			String query = "SELECT CUI, STR, SUPPRESS, TTY, LAT, STT, LUI"
-					+ " FROM MRCONSO "
-					+ "WHERE ( lcase(LAT) = 'eng' OR lcase(LAT) = 'ger')";
-				    
 			// Objekt zum Ausfuehren von Queries
 			PreparedStatement psmt = conn.prepareStatement(query);
 			ResultSet rs = psmt.executeQuery(query);
@@ -242,7 +238,7 @@ public class UMLSImporter extends PreSourceImporter{
 		System.out.println("Load data from UMLS repository done in "+end+" min.");
 		return dataset;
 	}
-	
+
 	public static void setValues(PreparedStatement preparedStatement,
 			String[] values) throws SQLException {
 		for (int i = 0; i < values.length; i++) {

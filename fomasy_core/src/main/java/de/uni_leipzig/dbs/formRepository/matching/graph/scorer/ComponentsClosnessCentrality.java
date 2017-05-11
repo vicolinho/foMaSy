@@ -3,6 +3,7 @@ package de.uni_leipzig.dbs.formRepository.matching.graph.scorer;
 import java.util.Collection;
 import java.util.Set;
 
+import com.google.common.base.Function;
 import org.apache.commons.collections15.Transformer;
 
 import de.uni_leipzig.dbs.formRepository.dataModel.graph.data.Node;
@@ -25,7 +26,7 @@ public class ComponentsClosnessCentrality<V,E> extends ComponentDistanceCentrali
      * @param graph the input graph
      * @param edge_weights the edge weights to be used to determine vertex/vertex distances
      */
-    public ComponentsClosnessCentrality(Hypergraph<V,E> graph, Transformer<E, ? extends Number> edge_weights,Collection<Node> collection)
+    public ComponentsClosnessCentrality(Hypergraph<V,E> graph, Function<E, ? extends Number> edge_weights, Collection<Node> collection)
     {
         super(graph, edge_weights,false,collection);
     }

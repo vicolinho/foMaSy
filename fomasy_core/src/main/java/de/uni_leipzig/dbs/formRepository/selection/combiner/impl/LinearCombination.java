@@ -28,8 +28,8 @@ public class LinearCombination implements ICombiner{
         Map<Integer,Double> cscores = aggregatedScore.get(coonceptsPerItem.getKey());
         if (cscores == null){
           cscores = new HashMap<>();
+          aggregatedScore.put(coonceptsPerItem.getKey(), cscores);
         }
-        aggregatedScore.put(coonceptsPerItem.getKey(), cscores);
         for (Map.Entry<Integer, Double> scoreConcept:coonceptsPerItem.getValue().entrySet()){
           if (cscores.get(scoreConcept.getKey())==null){
             cscores.put(scoreConcept.getKey(), scoreConcept.getValue()*weightVector[index]);

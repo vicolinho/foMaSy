@@ -65,7 +65,7 @@ public class CommonTokenConflict extends AbstractConflictGenerator{
       }
     }
     WeakComponentClusterer<Integer,Integer> componentClusterer = new WeakComponentClusterer<>();
-    Set<Set<Integer>>ccs= componentClusterer.transform(graphOverlap);
+    Set<Set<Integer>>ccs= componentClusterer.apply(graphOverlap);
     return ccs;
   }
 }

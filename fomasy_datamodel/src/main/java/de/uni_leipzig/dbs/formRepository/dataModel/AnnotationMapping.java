@@ -84,6 +84,9 @@ public class AnnotationMapping {
 		}*/
 	}
 
+	public void removeAnnotation (long code) {
+		this.annotations.remove(code);
+	}
 
 	public EntityAnnotation getAnnotation (long id){
 		return this.annotations.get(id);

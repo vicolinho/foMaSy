@@ -1,6 +1,5 @@
 package de.uni_leipzig.dbs.formRepository.evaluation.tool.dictionary.io;
 
-import com.ctc.wstx.exc.WstxIOException;
 import com.sun.xml.internal.ws.api.streaming.XMLStreamWriterFactory;
 import de.uni_leipzig.dbs.formRepository.dataModel.EntityStructureVersion;
 import de.uni_leipzig.dbs.formRepository.dataModel.GenericEntity;
@@ -65,11 +64,7 @@ public class ConceptMapperDictBuilder {
 
       for (ImportProperty gp: ge.getProperties()){
           writer.writeStartElement(SYN);
-        try {
           writer.writeAttribute(VALUE, gp.getValue());
-        }catch (WstxIOException e){
-          e.printStackTrace();
-        }
           writer.writeEndElement();
       }
       writer.writeEndElement();

@@ -12,6 +12,11 @@ import java.util.Set;
 public class LocalScoreContext {
 
 
+  private LocalScoreContext (Int2FloatMap idfMap, Int2ObjectMap<String> posTags){
+    this.idfMap = idfMap;
+    this.posTags = posTags;
+  }
+
   public Int2FloatMap getIdfMap() {
     return idfMap;
   }
@@ -35,4 +40,23 @@ public class LocalScoreContext {
   private Int2ObjectMap<String> posTags;
 
 
+  public static class Builder{
+    Int2FloatMap idfMap;
+    Int2ObjectMap<String> posTags;
+
+    public Builder idfMap(Int2FloatMap idfMap){
+      this.idfMap = idfMap;
+      return this;
+    }
+
+    public Builder posTags(Int2ObjectMap<String> posTags){
+      this.posTags = posTags;
+      return this;
+    }
+
+    public LocalScoreContext build(){
+      LocalScoreContext lsc = new LocalScoreContext(idfMap, posTags);
+      return lsc;
+    }
+  }
 }

@@ -31,7 +31,8 @@ public class EntityStructureImporter {
 	//public static final String COMPACT_VERSION ="compactVersion";
 	public static final String DESCR = "description";
 	public static final String IS_RELATIONSHIP_IMPORT = "isRelationshipImport";
-	
+	private static final String QUERY = "query";
+
 	private String formName; 
 	private String timeStamp;
 	private String topic;
@@ -48,6 +49,10 @@ public class EntityStructureImporter {
 	private VersionMetadata currentMetadata;
 	private String sourceType;
 	private String descr;
+
+
+
+	private String sqlQuery;
 	
 	
 	public void importEntityStructure (Map<String, Object> properties) throws InstantiationException, IllegalAccessException,
@@ -78,6 +83,7 @@ public class EntityStructureImporter {
 			if (sourceType.equals("rdbms")){
 				user = (String) properties.get(USER);
 				pw = (String) properties.get(PW);
+				sqlQuery = (String)properties.get(QUERY);
 			}
 			if (sourceType.equals("obj")){
 				this.entities = (List<ImportEntity>) properties.get("entities");
@@ -282,7 +288,13 @@ public class EntityStructureImporter {
 		return isRelationImport;
 	}
 
+	public String getSqlQuery() {
+		return sqlQuery;
+	}
 
+	public void setSqlQuery(String sqlQuery) {
+		this.sqlQuery = sqlQuery;
+	}
 
 	public void setRelationImport(boolean isRelationImport) {
 		this.isRelationImport = isRelationImport;

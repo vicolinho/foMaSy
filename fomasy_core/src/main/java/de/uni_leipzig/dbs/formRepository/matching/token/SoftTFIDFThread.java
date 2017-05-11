@@ -137,10 +137,10 @@ Logger log = Logger.getLogger(getClass());
 					}
 					float sim = aggFunc.aggregateFloatList(confidenceList);
 					Set<Integer> evidence = evidenceConfMap.get(sim);
-					Set<Integer> pos = positionMap.get(sim);
-					this.addResultWithPositions(entitySrcId, te, evidence, pos, sim);
-					//this.addResultWithEvidence(srcStructure.getStructureId(), targetStructure.getStructureId(),
-					// entitySrcId, te,evidence, sim);
+					//Set<Integer> pos = positionMap.get(sim);
+					//this.addResultWithPositions(entitySrcId, te, evidence, pos, sim);
+					this.addResultWithEvidence(srcStructure.getStructureId(), targetStructure.getStructureId(),
+					 entitySrcId, te,evidence, sim);
 					confidenceList.clear();
 				}
 			}

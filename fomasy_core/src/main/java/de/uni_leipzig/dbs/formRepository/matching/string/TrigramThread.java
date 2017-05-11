@@ -8,11 +8,8 @@ import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 
-import cern.colt.Arrays;
-import it.unimi.dsi.fastutil.ints.Int2IntMap;
+
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
-import it.unimi.dsi.fastutil.ints.IntSet;
-import it.unimi.dsi.fastutil.longs.Long2FloatMap;
 import de.uni_leipzig.dbs.formRepository.dataModel.encoding.EncodedEntityStructure;
 import de.uni_leipzig.dbs.formRepository.matching.AbstractPartMatcher;
 import de.uni_leipzig.dbs.formRepository.matching.aggregation.AggregationFunction;

@@ -14,10 +14,9 @@ import java.util.Set;
  */
 public class TextualSimilarityScorer extends AbstractLocalScorer {
 
-
   @Override
   public Map<Integer, Map<Integer, Double>> computeScore(AnnotationMapping am, EncodedEntityStructure form,
-                                                         EncodedEntityStructure ontology,LocalScoreContext ctx) {
+                                                         EncodedEntityStructure ontology, LocalScoreContext ctx) {
 
     Map<Integer, Map<Integer,Double>> ranking = new HashMap<>();
     for (Map.Entry<Integer, Set<EntityAnnotation>>e: this.groupBySrcEntity(am).entrySet()){

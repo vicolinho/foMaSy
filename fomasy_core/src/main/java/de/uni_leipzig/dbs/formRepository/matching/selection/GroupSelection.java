@@ -13,15 +13,11 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import de.uni_leipzig.dbs.formRepository.dataModel.EncodedAnnotationMapping;
-import de.uni_leipzig.dbs.formRepository.dataModel.util.CantorDecoder;
 import de.uni_leipzig.dbs.formRepository.exception.MatchingExecutionException;
 import de.uni_leipzig.dbs.formRepository.matching.aggregation.AggregationFunction;
 import de.uni_leipzig.dbs.formRepository.matching.execution.RegisteredMatcher;
 import de.uni_leipzig.dbs.formRepository.matching.execution.data.ExecutionTree;
 import de.uni_leipzig.dbs.formRepository.matching.execution.data.MatchOperator;
-import edu.ucla.sspace.similarity.SimilarityFunction;
-import it.unimi.dsi.fastutil.longs.Long2FloatMap;
-import it.unimi.dsi.fastutil.longs.Long2FloatOpenHashMap;
 import org.apache.log4j.Logger;
 
 import de.uni_leipzig.dbs.formRepository.FormRepository;
@@ -76,9 +72,10 @@ public class GroupSelection implements Selection{
 				if (isCommonToken){
 					isCommonToken = !corSet.getEvidenceMap().isEmpty();
 				}
-				if (isCommonToken)
+				if (isCommonToken) {
 					umlsGroups = GroupFunctions.groupSimilarUMLSConsByCommonToken(umlsCons, e.getKey(), corSet);
-				else{
+					log.debug("groups:" + umlsGroups.values().toString());
+				}else{
 					umlsGroups = GroupFunctions.groupSimilarUMLSConsByConnectedComponent(umlsCons, preRanAtts,
 									umls.getObjIds().size(), gi,t);
 				}
@@ -152,7 +149,6 @@ public class GroupSelection implements Selection{
 				}
 				if (isCommonToken) {
 					umlsGroups = GroupFunctions.groupSimilarUMLSConsByCommonToken(umlsCons, e.getKey(), corSet);
-					log.info("using token overlap");
 				}else {
 					umlsGroups = GroupFunctions.groupSimilarUMLSConsByConnectedComponent(umlsCons, preRanAtts, umls.getObjIds().size(), gi, t);
 					log.info("using new sims");

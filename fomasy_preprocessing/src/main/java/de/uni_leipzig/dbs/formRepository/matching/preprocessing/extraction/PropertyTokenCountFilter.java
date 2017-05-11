@@ -1,17 +1,10 @@
 package de.uni_leipzig.dbs.formRepository.matching.preprocessing.extraction;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
+import de.uni_leipzig.dbs.formRepository.dataModel.*;
 import org.apache.log4j.Logger;
 
-import de.uni_leipzig.dbs.formRepository.dataModel.EntitySet;
-import de.uni_leipzig.dbs.formRepository.dataModel.EntityStructureVersion;
-import de.uni_leipzig.dbs.formRepository.dataModel.GenericEntity;
-import de.uni_leipzig.dbs.formRepository.dataModel.PropertyValue;
-import de.uni_leipzig.dbs.formRepository.dataModel.StringPropertyValueSet;
 import de.uni_leipzig.dbs.formRepository.matching.preprocessing.PreprocessProperty;
 import de.uni_leipzig.dbs.formRepository.matching.preprocessing.Preprocessor;
 
@@ -30,25 +23,29 @@ public class PropertyTokenCountFilter implements Preprocessor{
 			
 			for (PreprocessProperty pp : propList){
 				float avgCount = 0;
-				List<String> propValues = ge.getPropertyValues(pp.getName(),pp.getLang(),pp.getScope());
-				for (String pv: propValues){
-					String[] tokens = pv.split("[^A-Za-z0-9]");
-					avgCount+=tokens.length;
-				}
-				avgCount=avgCount/(float)propValues.size();
-				StringPropertyValueSet pvSet = ge.getPropertyValueSet(pp.getName(), pp.getLang(), pp.getScope());
-				Set<PropertyValue> remValues = new HashSet<PropertyValue>();
-				for (PropertyValue pv: pvSet.getCollection()){
-					String[] tokens = pv.getValue().split("[^A-Za-z0-9]");
-					
-					if (tokens.length<avgCount*0.6){
-						log.debug(avgCount);
-						remValues.add(pv);
+				Set<GenericProperty> gps = ge.getGenericProperties(pp.getName(),pp.getLang(),pp.getScope());
+				int totalValues  =0;
+				for (GenericProperty gp :gps) {
+					List<PropertyValue> pvs = ge.getValues(gp);
+					for (PropertyValue pv : pvs) {
+						totalValues++;
+						String[] tokens = pv.getValue().split("[^A-Za-z0-9]");
+						avgCount += tokens.length;
+						totalValues++;
 					}
 				}
-				for (PropertyValue remPv: remValues){
-					ge.removePropertyValue(pp.getName(), pp.getLang(), pp.getScope(), remPv);
-					log.debug("remove property value : "+remPv.getValue()+" for "+ge.getAccession());
+				avgCount=avgCount/(float)totalValues;
+				for (GenericProperty gp :gps) {
+					List<PropertyValue> pvs = ge.getValues(gp);
+					Iterator<PropertyValue> pvIter = pvs.iterator();
+					while (pvIter.hasNext()) {
+						PropertyValue pv = pvIter.next();
+						String[] tokens = pv.getValue().split("[^A-Za-z0-9]");
+						if (tokens.length<avgCount*0.6){
+							log.debug(avgCount);
+							pvIter.remove();
+						}
+					}
 				}
 			}
 			
@@ -62,31 +59,33 @@ public class PropertyTokenCountFilter implements Preprocessor{
 			Map<String, Object> externalSources) {
 		// TODO Auto-generated method stub
 		for (GenericEntity ge: esv){
-			
 			for (PreprocessProperty pp : propList){
 				float avgCount = 0;
-				List<String> propValues = ge.getPropertyValues(pp.getName(),pp.getLang(),pp.getScope());
-				for (String pv: propValues){
-					String[] tokens = pv.split("[^A-Za-z0-9]");
-					avgCount+=tokens.length;
-				}
-				avgCount=avgCount/(float)propValues.size();
-				StringPropertyValueSet pvSet = ge.getPropertyValueSet(pp.getName(), pp.getLang(), pp.getScope());
-				Set<PropertyValue> remValues = new HashSet<PropertyValue>();
-				for (PropertyValue pv: pvSet.getCollection()){
-					String[] tokens = pv.getValue().split("[^A-Za-z0-9]");
-					
-					if (tokens.length<avgCount*0.6){
-						log.debug(avgCount);
-						remValues.add(pv);
+				Set<GenericProperty> gps = ge.getGenericProperties(pp.getName(),pp.getLang(),pp.getScope());
+				int totalValues  =0;
+				for (GenericProperty gp :gps) {
+					List<PropertyValue> pvs = ge.getValues(gp);
+					for (PropertyValue pv : pvs) {
+						totalValues++;
+						String[] tokens = pv.getValue().split("[^A-Za-z0-9]");
+						avgCount += tokens.length;
+						totalValues++;
 					}
 				}
-				for (PropertyValue remPv: remValues){
-					ge.removePropertyValue(pp.getName(), pp.getLang(), pp.getScope(), remPv);
-					log.debug("remove property value : "+remPv.getValue()+" for "+ge.getAccession());
+				avgCount=avgCount/(float)totalValues;
+				for (GenericProperty gp :gps) {
+					List<PropertyValue> pvs = ge.getValues(gp);
+					Iterator<PropertyValue> pvIter = pvs.iterator();
+					while (pvIter.hasNext()) {
+						PropertyValue pv = pvIter.next();
+						String[] tokens = pv.getValue().split("[^A-Za-z0-9]");
+						if (tokens.length<avgCount*0.6){
+							log.debug(avgCount);
+							pvIter.remove();
+						}
+					}
 				}
 			}
-			
 		}
 		return esv;
 	}

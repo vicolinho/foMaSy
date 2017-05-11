@@ -13,6 +13,7 @@ import de.uni_leipzig.dbs.formRepository.selection.scorer.data.CollectiveScoreCo
 import de.uni_leipzig.dbs.formRepository.selection.scorer.data.LocalScoreContext;
 import de.uni_leipzig.dbs.formRepository.selection.scorer.local.LocalScorer;
 import de.uni_leipzig.dbs.formRepository.selection.scorer.local.TextualSimilarityScorer;
+import org.apache.log4j.Logger;
 
 import java.util.*;
 
@@ -21,6 +22,9 @@ import java.util.*;
  */
 public class Selection {
 
+
+  static Logger log = Logger.getLogger(Selection.class);
+
   LocalScorer[]localScorers;
   CollectiveScorer[] collectiveScorers;
   IConflictGenerator generator;
@@ -28,10 +32,12 @@ public class Selection {
   GenerationContext gc;
   LocalScoreContext lsc;
   CollectiveScoreContext csc;
+  ISelectionAlgorithm selectionAlgorithm;
 
 
   protected Selection(LocalScorer[] localScorers, CollectiveScorer[] collectiveScorers, IConflictGenerator generator,
-                   LocalScoreContext lsc, CollectiveScoreContext csc, GenerationContext gc, ICombiner combiner) {
+                   LocalScoreContext lsc, CollectiveScoreContext csc, GenerationContext gc, ICombiner combiner,
+                      ISelectionAlgorithm selectionAlgorithm) {
     this.localScorers = localScorers;
     this.collectiveScorers = collectiveScorers;
     this.generator = generator;
@@ -39,11 +45,12 @@ public class Selection {
     this.gc = gc;
     this.csc = csc;
     this.combiner = combiner;
+    this.selectionAlgorithm = selectionAlgorithm;
   }
 
 
   /**
-   * 1. generate confilct concepts for each item
+   * 1. generate confilct concepts for each item </>
    * 2. compute scores for each item and its annotations
    * 3. combine scores
    * 4. select concepts with highest score per group and item
@@ -54,10 +61,11 @@ public class Selection {
    */
   public AnnotationMapping select(AnnotationMapping am, EncodedEntityStructure src, EncodedEntityStructure target){
     Map<Integer, Set<Set<Integer>>> conflictSetPerItem = generator.getConflictAnnotations(am, target, gc);
+
     List<Map<Integer,Map<Integer,Double>>> scores = new ArrayList<>();
     if (localScorers != null) {
       for (LocalScorer ls : localScorers){
-        scores.add(ls.computeScore(am, src, target, lsc));
+        scores.add(ls.computeScore(am, src, target,lsc));
       }
     }
     if (collectiveScorers != null){
@@ -66,17 +74,17 @@ public class Selection {
       }
     }
     Map<Integer,Map<Integer,Double>> combinedScore = combiner.combine(scores);
-    ISelectionAlgorithm algorithm = new SelectionPerGroup();
-    return algorithm.computeSelection(am, conflictSetPerItem, combinedScore);
+    return selectionAlgorithm.computeSelection(am, conflictSetPerItem, combinedScore);
   }
 
-  public class Builder{
+  public static class Builder{
     LocalScorer[]localScorers;
     CollectiveScorer[] collectiveScorers;
     LocalScoreContext lsc;
     CollectiveScoreContext csc;
     IConflictGenerator generator;
     GenerationContext generationContext;
+    ISelectionAlgorithm selectionAlgorithm;
     ICombiner combiner;
 
     public Builder localScorers(LocalScorer[]localScorers){
@@ -114,16 +122,24 @@ public class Selection {
       return this;
     }
 
+    public Builder selectionAlogrithm (ISelectionAlgorithm algorithm){
+      this.selectionAlgorithm = algorithm;
+      return  this;
+    }
+
     public Selection build() throws SelectionBuildException {
       if (localScorers == null && collectiveScorers ==null){
         localScorers = new LocalScorer[]{new TextualSimilarityScorer()};
-        lsc = new LocalScoreContext();
+        lsc = new LocalScoreContext.Builder().build();
       }
       if (this.generator == null){
         throw new SelectionBuildException("conflict generator has to be initialized");
       }
+      if (selectionAlgorithm == null){
+        selectionAlgorithm = new SelectionPerGroup();
+      }
       Selection selection = new Selection(localScorers, collectiveScorers, generator, lsc, csc, generationContext,
-              combiner);
+              combiner, selectionAlgorithm);
       return selection;
     }
   }

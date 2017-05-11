@@ -6,7 +6,6 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import org.apache.log4j.Logger;
 
-import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 
 /**
  * This class represents an entity that is characterized with its properties.

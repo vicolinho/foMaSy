@@ -12,6 +12,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 
+import com.google.common.base.Function;
 import org.apache.commons.collections15.Transformer;
 import org.apache.log4j.Logger;
 
@@ -30,6 +31,8 @@ import edu.uci.ics.jung.algorithms.filters.KNeighborhoodFilter;
 import edu.uci.ics.jung.algorithms.filters.KNeighborhoodFilter.EdgeType;
 import edu.uci.ics.jung.algorithms.scoring.ClosenessCentrality;
 import edu.uci.ics.jung.graph.DirectedGraph;
+
+import javax.annotation.Nullable;
 
 public class CooccurrenceAnnotationSelection implements GraphBasedSelection {
 
@@ -161,7 +164,7 @@ public class CooccurrenceAnnotationSelection implements GraphBasedSelection {
 			}
 		}
 		KNeighborhoodFilter<Node,Edge> filter= new KNeighborhoodFilter<Node,Edge>(roots, 3, EdgeType.IN_OUT);
-		DirectedGraph<Node,Edge> subGraph = (DirectedGraph<Node, Edge>) filter.transform(graph);
+		DirectedGraph<Node,Edge> subGraph = (DirectedGraph<Node, Edge>) filter.apply(graph);
 		
 		for (Edge e: subGraph.getEdges()){
 			if (e.getType().equals("co_annotates")){
@@ -172,13 +175,14 @@ public class CooccurrenceAnnotationSelection implements GraphBasedSelection {
 		}
 		//GraphExport exporter = new GraphExport();
 		//exporter.writeGraphCSV("graphs/"+srcEntity, subGraph);
-		Transformer<Edge, Float> transformer = new Transformer<Edge,Float>(){
-			public Float transform(Edge input) {
+		Function<Edge, Float> transformer = new Function<Edge, Float>(){
+			@Override
+			public Float apply(@Nullable Edge edge) {
 				float distance =0;
-				if (input.getType().equals("co_form_annotates"))
-					distance = 1/(input.getWeight()*0.5f);
+				if (edge.getType().equals("co_form_annotates"))
+					distance = 1/(edge.getWeight()*0.5f);
 				else
-					distance = 1/input.getWeight();
+					distance = 1/edge.getWeight();
 				return distance;
 			}
 		};
@@ -224,7 +228,7 @@ public class CooccurrenceAnnotationSelection implements GraphBasedSelection {
 		
 		KNeighborhoodFilter<Node,Edge> filter= new KNeighborhoodFilter<Node,Edge>(roots, 3, EdgeType.IN_OUT);
 		
-		DirectedGraph<Node,Edge> subGraph = (DirectedGraph<Node, Edge>) filter.transform(graph);
+		DirectedGraph<Node,Edge> subGraph = (DirectedGraph<Node, Edge>) filter.apply(graph);
 		Set <Node> nodes = new HashSet<Node>();
 		Set <Edge> edges = new HashSet<Edge>();
 		for (Edge e :subGraph.getEdges()){
@@ -265,15 +269,16 @@ public class CooccurrenceAnnotationSelection implements GraphBasedSelection {
 		
 //		GraphExport exporter = new GraphExport();
 //		exporter.writeGraphCSV("graphs/"+srcEntity, subGraph);
-		Transformer<Edge, Float> transformer = new Transformer<Edge,Float>(){
-			public Float transform(Edge input) {
+		Function<Edge, Float> transformer = new Function<Edge,Float>() {
+			@Override
+			public Float apply(@Nullable Edge edge) {
 				float distance = 0;
-				if (input.getType().equals("co_form_annotates")){
-					distance = 1/(input.getWeight()*0.2f);
-				}else{
-					distance = 1/(input.getWeight());
-					if (input.getType().equals("co_annotates"))
-						log.debug(input.toString());
+				if (edge.getType().equals("co_form_annotates")) {
+					distance = 1 / (edge.getWeight() * 0.2f);
+				} else {
+					distance = 1 / (edge.getWeight());
+					if (edge.getType().equals("co_annotates"))
+						log.debug(edge.toString());
 				}
 				return distance;
 			}

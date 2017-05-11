@@ -98,8 +98,8 @@ public class RDBMS_GraphAPI implements GraphAPI{
 			values.addAll(joinValues);
 		}
 		EntitySet<GenericEntity> nodeSet = entApi.getEntityWithPropertiesByProperty(values, externalStructure, joinExternalAttribute);
-		nodeMap = new HashMap<Integer,Node>();
-		parentChildRelationship = new HashMap<String, Map<Integer,List<Edge>>>();
+		nodeMap = new HashMap<>();
+		parentChildRelationship = new HashMap<>();
 		
 		this.breathFirstSearch(con, nodeSet, valueEntityMapping, joinExternalAttribute, depth);
 		GraphBuilder builder = new GraphBuilder();
@@ -211,7 +211,7 @@ public class RDBMS_GraphAPI implements GraphAPI{
 			Map <String,List<GenericEntity>> valueEntityMapping,Set<GenericProperty> gp,int depth ) throws GraphAPIException{
 		try {
 			Set<Integer> alreadyVisit = new HashSet<Integer>();
-			PreparedStatement relStmt = con.prepareStatement(RELS);
+			PreparedStatement relStmt = con.prepareStatement(INV_RELS);
 			for (GenericEntity ge : nodeSet){
 				alreadyVisit.clear();
 				this.addEdgeToSourceNode(ge, valueEntityMapping, gp);
@@ -286,7 +286,7 @@ public class RDBMS_GraphAPI implements GraphAPI{
 	private void breathFirstSearch (Connection con,EntitySet<GenericEntity> roots,int depth){
 		try {
 			Set<Integer> alreadyVisit = new HashSet<Integer>();
-			PreparedStatement relStmt = con.prepareStatement(RELS);
+			PreparedStatement relStmt = con.prepareStatement(INV_RELS);
 			for (GenericEntity ge : roots){
 				alreadyVisit.clear();
 				Node n = new NodeImpl(ge.getId());

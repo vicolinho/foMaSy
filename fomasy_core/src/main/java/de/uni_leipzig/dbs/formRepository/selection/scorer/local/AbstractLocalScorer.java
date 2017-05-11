@@ -13,6 +13,8 @@ import java.util.Set;
  */
 public abstract class AbstractLocalScorer implements LocalScorer{
 
+
+
   protected Map<Integer,Set<EntityAnnotation>> groupBySrcEntity (AnnotationMapping am){
     Map<Integer,Set<EntityAnnotation>> groups = new HashMap<>();
     for (EntityAnnotation cor:am.getAnnotations()){

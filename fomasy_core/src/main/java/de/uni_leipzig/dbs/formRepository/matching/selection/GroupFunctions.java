@@ -4,7 +4,6 @@ package de.uni_leipzig.dbs.formRepository.matching.selection;
 import edu.stanford.nlp.graph.ConnectedComponents;
 import edu.uci.ics.jung.algorithms.cluster.WeakComponentClusterer;
 import edu.uci.ics.jung.graph.*;
-import it.unimi.dsi.fastutil.ints.Int2FloatMap;
 
 import java.util.*;
 import java.util.Map.Entry;
@@ -24,8 +23,6 @@ import de.uni_leipzig.dbs.formRepository.matching.execution.RegisteredMatcher;
 import de.uni_leipzig.dbs.formRepository.matching.execution.data.ExecutionTree;
 import de.uni_leipzig.dbs.formRepository.matching.execution.data.MatchOperator;
 import de.uni_leipzig.dbs.formRepository.matching.holistic.clustering.CliqueIdentification;
-import de.uni_leipzig.dbs.formRepository.matching.preprocessing.TokenWeighting.TFIDFTokenWeightGenerator;
-import de.uni_leipzig.dbs.formRepository.matching.token.TFIDFMatcher;
 import de.uni_leipzig.dbs.formRepository.util.CantorDecoder;
 import edu.ucla.sspace.clustering.Assignments;
 import edu.ucla.sspace.clustering.ChineseWhispers;
@@ -272,14 +269,13 @@ public  static Map<Integer, Set<Integer>> groupSimilarUMLSConsByConnectedCompone
 	
 public static Map<Integer, Set<Integer>> groupSimilarUMLSConsByCommonToken(EncodedEntityStructure umlsGroup,
 		int srcId, AnnotationMapping am) {
-	Map<Integer,List<Integer>> umlsGroups = new HashMap<>();
 	Map<Integer,Set<Integer>> conceptToEvidenceSet = new HashMap<Integer,Set<Integer>>();
 	for (int targetId : umlsGroup.getObjIds().keySet()){
 		long anid = CantorDecoder.code(srcId, targetId);
 		Set<Integer> evidence = am.getEvidenceMap().get(anid);
 		conceptToEvidenceSet.put(targetId, evidence);
 	}
-
+	log.info(conceptToEvidenceSet.toString());
 	Map<Integer, Set<Integer>> conceptTosupersets = getOverlappedConcepts(conceptToEvidenceSet);
 	return conceptTosupersets;
 }
@@ -310,7 +306,7 @@ public static Map<Integer, Set<Integer>> groupSimilarUMLSConsByCommonToken(Encod
 		}
 		Map<Integer,Set<Integer>> groupTerm = new HashMap<>();
 		WeakComponentClusterer<Integer,Integer> componentClusterer = new WeakComponentClusterer<>();
-		Set<Set<Integer>>ccs= componentClusterer.transform(graphOverlap);
+		Set<Set<Integer>>ccs= componentClusterer.apply(graphOverlap);
 		int ccId = 0;
 		for (Set<Integer> cc: ccs){
 			groupTerm.put(ccId++, cc);

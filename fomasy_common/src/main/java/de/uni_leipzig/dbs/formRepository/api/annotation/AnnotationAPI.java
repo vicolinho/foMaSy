@@ -16,22 +16,24 @@ public interface AnnotationAPI {
 	 * @param targetStructureId
 	 * @return
 	 */
-	public AnnotationMapping getAnnotationMapping (Long2FloatMap mapping, int sourceStructureId, int targetStructureId);
+	AnnotationMapping getAnnotationMapping(Long2FloatMap mapping, int sourceStructureId, int targetStructureId);
 
-	public List<VersionMetadata> checkInvolvedVersion(VersionMetadata srcStruct,
-			VersionMetadata targetStruct);
+	List<VersionMetadata> checkInvolvedVersion(VersionMetadata srcStruct,
+																						 VersionMetadata targetStruct);
 
 	/**
 	 * import an annotation mapping for the specified sources in the list
 	 * @param guranteedInvolvedStructures associated sources
 	 * @param iam
 	 */
-	public void importMapping(List<VersionMetadata> guranteedInvolvedStructures, AnnotationMapping iam);
+	void importMapping(List<VersionMetadata> guranteedInvolvedStructures, AnnotationMapping iam);
 
-	public void importMapping(
-			List<VersionMetadata> guranteedInvolvedStructures,
-			ImportAnnotationMapping iam);
+	void importMapping(
+					List<VersionMetadata> guranteedInvolvedStructures,
+					ImportAnnotationMapping iam);
 	
 	
-	public AnnotationMapping getAnnotationMapping(VersionMetadata src, VersionMetadata target, String name);
+	AnnotationMapping getAnnotationMapping(VersionMetadata src, VersionMetadata target, String name);
+
+	AnnotationMapping getGeneratedAnnotationMapping(VersionMetadata src, VersionMetadata target, String name);
 }

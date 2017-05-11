@@ -4,10 +4,7 @@ import com.fasterxml.jackson.databind.introspect.AnnotationMap;
 import de.uni_leipzig.dbs.formRepository.FormRepository;
 import de.uni_leipzig.dbs.formRepository.FormRepositoryImpl;
 import de.uni_leipzig.dbs.formRepository.api.util.InitializationException;
-import de.uni_leipzig.dbs.formRepository.dataModel.AnnotationMapping;
-import de.uni_leipzig.dbs.formRepository.dataModel.EntityStructureVersion;
-import de.uni_leipzig.dbs.formRepository.dataModel.GenericProperty;
-import de.uni_leipzig.dbs.formRepository.dataModel.VersionMetadata;
+import de.uni_leipzig.dbs.formRepository.dataModel.*;
 import de.uni_leipzig.dbs.formRepository.evals.calculation.EvaluationResult;
 import de.uni_leipzig.dbs.formRepository.evals.calculation.MappingEvaluation;
 import de.uni_leipzig.dbs.formRepository.evaluation.exception.AnnotationException;
@@ -48,7 +45,8 @@ public class CtakeExecution {
   public static void main (String[] args){
 
     String date = "2014-01-01";
-    String name = "umls2014AB";
+    //String name = "umls2014AB";
+    String name = "umls2014AB_extract";
     String type = "ontology";
 
     Properties prop = new Properties();
@@ -88,6 +86,7 @@ public class CtakeExecution {
         for (EntityStructureVersion es : esvSet) {
           if (usedTrials.contains(es.getMetadata().getName())) {
             AnnotationMapping am = wrapper.computeMapping(es, prop);
+            am = removeConceptsNotInExtract(am, cui2Id);
             overallMapping = SetAnnotationOperator.union(AggregationFunction.MAX, overallMapping, am);
           }
         }
@@ -124,6 +123,27 @@ public class CtakeExecution {
     }
   }
 
+  /**
+   *
+   * @param am
+   * @param cui2Id mapping between CUI and id for each concept from the repository
+   * @return
+   */
+  public static AnnotationMapping removeConceptsNotInExtract(AnnotationMapping am, Map<String,Integer>cui2Id){
+    //annotations not in ontology because concept is not in repository;
+    Set<Long> removeCorrs = new HashSet<>();
+    //all ctakes annotations
+    for (EntityAnnotation ea: am.getAnnotations()){
+      if (!cui2Id.containsKey(ea.getTargetAccession())){
+        removeCorrs.add(ea.getId());
+      }
+    }
+    //remove
+    for (long rc: removeCorrs){
+      am.removeAnnotation(rc);
+    }
+    return am;
+  }
   public static String writeTable(String[] header, List<String[]> result){
     StringBuilder sb = new StringBuilder();
     sb.append("method"+"\t");

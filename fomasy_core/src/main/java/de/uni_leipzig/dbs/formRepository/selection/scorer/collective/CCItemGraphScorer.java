@@ -1,8 +1,8 @@
 package de.uni_leipzig.dbs.formRepository.selection.scorer.collective;
 
+import com.google.common.base.Function;
 import de.uni_leipzig.dbs.formRepository.dataModel.AnnotationMapping;
 import de.uni_leipzig.dbs.formRepository.dataModel.EntityAnnotation;
-import de.uni_leipzig.dbs.formRepository.dataModel.encoding.EncodedEntityStructure;
 import de.uni_leipzig.dbs.formRepository.dataModel.graph.data.Edge;
 import de.uni_leipzig.dbs.formRepository.dataModel.graph.data.Node;
 import de.uni_leipzig.dbs.formRepository.dataModel.graph.data.NodeImpl;
@@ -10,10 +10,9 @@ import de.uni_leipzig.dbs.formRepository.matching.graph.scorer.ComponentsClosnes
 import de.uni_leipzig.dbs.formRepository.selection.scorer.data.CollectiveScoreContext;
 import edu.uci.ics.jung.algorithms.filters.KNeighborhoodFilter;
 import edu.uci.ics.jung.graph.DirectedGraph;
-import org.apache.commons.collections15.Transformer;
 import org.apache.log4j.Logger;
 
-import java.nio.DoubleBuffer;
+import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -29,6 +28,8 @@ public class CCItemGraphScorer implements CollectiveScorer {
   @Override
   public Map<Integer, Map<Integer, Double>> computeScore(AnnotationMapping am, Map<Integer, Set<Set<Integer>>> conflictSet,
       CollectiveScoreContext scContext) {
+
+    log.info("#vertices:" +scContext.getGraph().getVertexCount()+", #edges:"+scContext.getGraph().getEdgeCount());
     Map<Integer, Map<Integer, Double>> rankingPerItem = new HashMap<>();
     int depth = scContext.getDepth();
     Set<Integer> formConceptNodes = new HashSet<>();
@@ -53,8 +54,7 @@ public class CCItemGraphScorer implements CollectiveScorer {
 
 
   public Map<Integer,Double> calculateScores (DirectedGraph<Node, Edge> graph, int depth, AnnotationMapping am,
-                                                    Set<Integer> umlSubset, int srcEntity, Set<Set<Integer>> conflictNodesPerNode,
-                                                    Set<Integer> formConceptNodes){
+      Set<Integer> umlSubset, int srcEntity, Set<Set<Integer>> conflictNodesPerNode, Set<Integer> formConceptNodes){
 
     Map<Integer,Double> ranking = new HashMap<>();
     Set<Node> roots = new HashSet<Node>();
@@ -68,7 +68,8 @@ public class CCItemGraphScorer implements CollectiveScorer {
     }
 
     KNeighborhoodFilter<Node,Edge> filter= new KNeighborhoodFilter<Node,Edge>(roots, depth, KNeighborhoodFilter.EdgeType.IN_OUT);
-    DirectedGraph<Node,Edge> subGraph = (DirectedGraph<Node, Edge>) filter.transform(graph);
+    DirectedGraph<Node,Edge> subGraph = (DirectedGraph<Node, Edge>) filter.apply(graph);
+    log.info("#vertices:" +subGraph.getVertexCount()+", #edges:"+subGraph.getEdgeCount());
     Set <Node> nodes = new HashSet<Node>();
     Set <Edge> edges = new HashSet<Edge>();
     for (Edge e :subGraph.getEdges()){
@@ -93,27 +94,34 @@ public class CCItemGraphScorer implements CollectiveScorer {
 
 //		GraphExport exporter = new GraphExport();
 //		exporter.writeGraphCSV("graphs/"+srcEntity, subGraph);
-    Transformer<Edge, Float> transformer = new Transformer<Edge,Float>(){
-      public Float transform(Edge input) {
+    Function<Edge, Float> transformer = new Function<Edge, Float>(){
+      @Override
+      public Float apply(@Nullable Edge edge) {
         float distance = 0;
-        if (input.getType().equals("co_form_annotates")){
-          distance = 1/(input.getWeight()*0.2f);
+        if (edge.getType().equals("co_form_annotates")){
+          distance = 1/(edge.getWeight()*0.2f);
         }else{
-          distance = 1/(input.getWeight());
-          if (input.getType().equals("co_annotates"))
-            log.debug(input.toString());
+          distance = 1/(edge.getWeight());
+          if (edge.getType().equals("co_annotates"))
+            log.debug(edge.toString());
         }
         return distance;
       }
     };
 
     ComponentsClosnessCentrality<Node,Edge> cc = new ComponentsClosnessCentrality<Node,Edge> (subGraph, transformer,relevantNodes.values());
-
+    double totalScore =0;
     for (Node n  :roots){
       Double score = cc.getVertexScore(n);
       if (score ==null)
         score =0d;
+      totalScore+=score;
       ranking.put(n.getId(), score);
+    }
+
+    //TODO check if normalization generates better results
+    for (Map.Entry<Integer, Double> n: ranking.entrySet()){
+      ranking.put(n.getKey(), n.getValue()/totalScore);
     }
     return ranking;
   }

@@ -1,5 +1,7 @@
 package de.uni_leipzig.dbs.formRepository.manager;
 
+import java.io.InputStream;
+import java.util.Map;
 import java.util.Set;
 
 import de.uni_leipzig.dbs.formRepository.dataModel.EntitySet;
@@ -26,4 +28,7 @@ public interface GraphManager {
 
 	DirectedGraph <Node,Edge> getIsAConcepts(EntitySet<GenericEntity> rootNodes, VersionMetadata structure,
 																					 int depth)throws GraphAPIException;
+
+	DirectedGraph<Node, Edge> getGraphFromCSV(InputStream is, char delimiter,
+																						boolean isHeader, Map<String, Integer> cui2IdMap) throws GraphAPIException;
 }

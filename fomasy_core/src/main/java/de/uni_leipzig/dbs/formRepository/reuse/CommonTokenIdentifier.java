@@ -15,12 +15,10 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 
-import cern.colt.Arrays;
 import de.uni_leipzig.dbs.formRepository.dataModel.GenericProperty;
 import de.uni_leipzig.dbs.formRepository.dataModel.encoding.EncodedEntityStructure;
 import de.uni_leipzig.dbs.formRepository.matching.holistic.HolisticMatchingAnnotation;
 import de.uni_leipzig.dbs.formRepository.matching.holistic.data.TokenCluster;
-import de.uni_leipzig.dbs.formRepository.matching.preprocessing.encoding.EncodingManager;
 
 public class CommonTokenIdentifier {
 
@@ -81,7 +79,7 @@ public class CommonTokenIdentifier {
 							
 						}
 						
-					}catch(NullPointerException e){e.printStackTrace();};
+					}catch(NullPointerException e){e.printStackTrace();}
 				}//each source property
 				 tokenClusters = this.getTokenCluster(countToken,tokenClusters);
 			}

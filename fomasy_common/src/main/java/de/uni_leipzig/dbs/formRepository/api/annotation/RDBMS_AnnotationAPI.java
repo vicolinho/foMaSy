@@ -142,6 +142,13 @@ public class RDBMS_AnnotationAPI implements AnnotationAPI {
 		
 	}
 
+	@Override
+	public AnnotationMapping getGeneratedAnnotationMapping(VersionMetadata src, VersionMetadata target, String name) {
+		return null;
+	}
+
+
+
 	public List <VersionMetadata> checkInvolvedVersion(	VersionMetadata srcStruct, VersionMetadata targetStruct) {
 		List<VersionMetadata> involvedStructures = new ArrayList<VersionMetadata>();
 		involvedStructures.add(srcStruct);involvedStructures.add(targetStruct);

@@ -4,6 +4,7 @@ import de.uni_leipzig.dbs.formRepository.dataModel.*;
 import de.uni_leipzig.dbs.formRepository.evaluation.exception.AnnotationException;
 import org.apache.ctakes.typesystem.type.refsem.UmlsConcept;
 import org.apache.ctakes.typesystem.type.textsem.IdentifiedAnnotation;
+import org.apache.log4j.Logger;
 import org.apache.uima.UIMAException;
 import org.apache.uima.UIMAFramework;
 import org.apache.uima.analysis_engine.AnalysisEngine;
@@ -34,6 +35,7 @@ public class CTakeWrapper implements AnnotationWrapper{
   public static final String ID_MAP = "idMap";
   public static final String PROPERTIES = "properties";
 
+  Logger log = Logger.getLogger(getClass());
   private AnalysisEngine ae;
 
   private Map<String, Integer> idMap;
@@ -53,6 +55,7 @@ public class CTakeWrapper implements AnnotationWrapper{
   public AnnotationMapping computeMapping(EntityStructureVersion esv, Properties prop) throws AnnotationException{
     Set<GenericProperty> usedProperties = (Set<GenericProperty>) prop.get(PROPERTIES);
     AnnotationMapping am = new AnnotationMapping();
+    int notInExtract =0;
     try {
       for (GenericEntity ge: esv.getEntities()){
         if (ge.getType().equals("item")) {
@@ -71,15 +74,16 @@ public class CTakeWrapper implements AnnotationWrapper{
                     EntityAnnotation ea = new EntityAnnotation(ge.getId(), idMap.get(concept.getCui()),
                             ge.getAccession(), concept.getCui(), 1f, false);
                     am.addAnnotation(ea);
+                  }else {
+                    notInExtract++;
                   }
-
                 }
               }
             }
           }
         }
       }
-
+      log.info("not in ontology:"+notInExtract);
     } catch (InvalidXMLException e) {
       throw new AnnotationException(e);
     } catch (ResourceInitializationException e) {

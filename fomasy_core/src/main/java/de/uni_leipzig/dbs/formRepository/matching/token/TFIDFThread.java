@@ -14,7 +14,6 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 
-import cern.colt.Arrays;
 import de.uni_leipzig.dbs.formRepository.dataModel.encoding.EncodedEntityStructure;
 import de.uni_leipzig.dbs.formRepository.matching.AbstractPartMatcher;
 import de.uni_leipzig.dbs.formRepository.matching.aggregation.AggregationFunction;

@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.common.base.Function;
 import org.apache.commons.collections15.Transformer;
 import org.apache.log4j.Logger;
 
@@ -116,9 +117,9 @@ public class ComponentDistanceCentralityScorer<V,E> implements VertexScorer<V, D
      * @param ignore_self_distances	Specifies whether distances from a vertex
      * to itself should be included in its score.
      */
-    public ComponentDistanceCentralityScorer(Hypergraph<V,E> graph, 
-            Transformer<E, ? extends Number> edge_weights, boolean averaging,
-            boolean ignore_missing, boolean ignore_self_distances)
+    public ComponentDistanceCentralityScorer(Hypergraph<V,E> graph,
+				 Function<E, ? extends Number> edge_weights, boolean averaging,
+				 boolean ignore_missing, boolean ignore_self_distances)
     {
         this(graph, new DijkstraDistance<V,E>(graph, edge_weights), averaging,
         	ignore_missing, ignore_self_distances);
@@ -133,8 +134,8 @@ public class ComponentDistanceCentralityScorer<V,E> implements VertexScorer<V, D
      * @param averaging     Specifies whether the values returned is the sum of 
      * all v-distances or the mean v-distance.
      */
-    public ComponentDistanceCentralityScorer(Hypergraph<V,E> graph, 
-            Transformer<E, ? extends Number> edge_weights, boolean averaging,Collection<Node> collection)
+    public ComponentDistanceCentralityScorer(Hypergraph<V,E> graph,
+	 			Function<E, ? extends Number> edge_weights, boolean averaging,Collection<Node> collection)
     {
         this(graph, new DijkstraDistance<V,E>(graph, edge_weights), averaging,
         	true, true);
